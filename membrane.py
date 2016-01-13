@@ -1,4 +1,4 @@
-__author__ = 'Dan'
+""" Functions for analyzing membrane properties of a cell """
 
 import numpy as np
 from scipy.optimize import curve_fit

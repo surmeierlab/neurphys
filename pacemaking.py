@@ -1,4 +1,4 @@
-b__author__ = 'Dan'
+""" Functions to analyze pacemaking activity data """
 import numpy as np
 
 
