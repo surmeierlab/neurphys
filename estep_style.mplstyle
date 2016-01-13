@@ -1,0 +1,38 @@
+# Author: Chad Estep (chadestep.github.io / chadestep@gmail.com)
+# "Because we're scientists, not graphic fucking designers."
+
+backend : pdf
+
+pdf.fonttype : 42
+
+figure.figsize: 10, 5
+figure.edgecolor: white
+figure.facecolor: white
+
+lines.linewidth: 1
+
+font.family : Calibri
+font.size : 14
+
+axes.color_cycle : 000000, 1f77b4, ff7f0e, 2ca02c, d62728, 9467bd, 8c564b, e377c2, 7f7f7f, bcbd22, 17becf
+				# 000000 : Black
+				# 1f77b4 : Blue
+				# ff7f0e : Orange
+				# 2ca02c : Green
+				# d62728 : Red
+				# 9467bd : Purple
+				# 8c564b : Brown
+				# e377c2 : Pink
+				# 7f7f7f : Grey
+				# bcbd22 : Yellow/green
+				# 17becf : Light blue
+axes.titlesize : large
+axes.labelsize : medium
+axes.axisbelow: True       # grid/ticks are below elements (e.g., lines, text)
+
+xtick.major.width : 1
+xtick.direction : out
+ytick.major.width : 1
+ytick.direction : out
+
+savefig.transparent: True
