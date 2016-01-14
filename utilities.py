@@ -7,21 +7,43 @@ from scipy.optimize import curve_fit
 def baseline(df, start_time, end_time):
     """Subtracts from entire data column average of subset of data column
     defined by start and end times.
+
+    Input Parameters
+    ----------------
+    df: data as pandas dataframe
+        should contain Time and Primary columns
+    start_time: positive number (seconds)
+        designates beginning of the region over which to average
+    end_time: positive number (seconds)
+        designates end of region over which to average
+
+    Return
+    ------
+    df: dataframe with modified Primary column
     """
-    
     avg = df.Primary[(df.Time >= start_time) & (df.Time <= end_time)].mean()
     df.Primary -= avg
 
     return df
 
+
 def find_peak(df, start_time, end_time, sign="min"):
     """Returns min (or max) of data subset as a dataframe
 
-    df: data as pandas dataframe, should contain Time and Primary columns
-    start_time: designates beginning of the epoch in which the event occurs
-    end_time: designates end of the epoch in which the event occurs 
-    sign: takes two values - 'min' or 'max' - depending on direction of event
+    Input Parameters
+    ----------------
+    df: data as pandas dataframe
+        should contain Time and Primary columns
+    start_time: positive number (seconds)
+        designates beginning of the epoch in which the event occurs
+    end_time: positive number (seconds)
+        designates end of the epoch in which the event occurs
+    sign: string (either 'min' or 'max')
+        indicates direction of event (min = neg going, max = pos going)
 
+    Return
+    -------
+    peak_df: dataframe of Peak Amp and Peak Time
     """
     df_sub = df[(df.Time >= start_time) & (df.Time <= end_time)]
     if sign == "min":
@@ -31,13 +53,13 @@ def find_peak(df, start_time, end_time, sign="min"):
 
     peak_df = df[df.Primary == peak][['Time', 'Primary']]
     peak_df.columns = ['Peak Time', 'Peak Amp']
-    
+
     return peak_df.tail(1)
 
 def calc_decay(df, peak, peak_time, return_plot_vals=False):
     """Performs biexponential fit of event, returns a weighted tao value
 
-    df: data as pandas dataframe, should contain Time and Primary columns. 
+    df: data as pandas dataframe, should contain Time and Primary columns.
     *Note that it is assumed that the Primary column in the passed df is assumed
     to have alredady been baselined
     peak: amplitude of event

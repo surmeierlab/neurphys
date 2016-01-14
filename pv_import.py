@@ -9,17 +9,17 @@ from glob import glob
 
 def _get_ephys_vals(element):
     ch_type = element.find('.//PatchclampChannel').text
-    
+
     if ch_type == '0':
         unit = element.find('.//UnitName').text
         divisor = float(element.find('.//Divisor').text)
-        
+
         return 'primary', {'unit': unit, 'divisor': divisor}
-    
+
     elif ch_type == '1':
         unit = element.find('.//UnitName').text
         divisor = float(element.find('.//Divisor').text)
-        
+
         return 'secondary', {'unit': unit, 'divisor': divisor}
 
 
@@ -43,7 +43,7 @@ def parse_xml(filename):
                 name = parent.find('.//Name').text
 
             ch_names.append(name.capitalize())
-    
+
     file_attr['channels'] = ch_names
     # gets sampling rate
     file_attr['sampling'] = int((tree.find('.//Rate')).text)
@@ -67,7 +67,7 @@ def parse_xml(filename):
             vo_file = datafile
     else:
         vo_file = datafile
-        
+
     file_attr['voltage recording file'] = vo_file
     file_attr['linescan file'] = ls_file
 
@@ -76,16 +76,16 @@ def parse_xml(filename):
 
 def import_vr_csv(filename, col_names, primary_div=1, secondary_div=1):
     """
-    Reads voltage recording .csv file into a pandas dataframe. 
+    Reads voltage recording .csv file into a pandas dataframe.
     Will convert Primary and Secondary channels to appropriate values if those
-    channels are in the file. 
+    channels are in the file.
 
     Returns a dataframe
     """
-    
+
     df = pd.read_csv(filename, names=col_names, skiprows=1)
     df.Time /= 1000
-    
+
     if "Primary" in df.columns:
         df.Primary /= primary_div
     if "Secondary" in df.columns:
@@ -102,14 +102,15 @@ def import_ls_csv(filename):
 
     df = pd.read_csv(filename, skipinitialspace=True)
     df.rename(columns=lambda header: header.strip('(ms)'), inplace=True)
-    #time columns occur as every other column, starting with column 0
+    # time columns occur as every other column, starting with column 0
     df.ix[:, ::2] /= 1000
 
     return df
 
+
 def import_folder(folder):
     """Collapse entire data folder into multidimensional dataframe
-    
+
     Returns a dictionary with "voltage recording", "linescan" and
     "file attributes" keys associate with 2 dataframes and a dictionary
     (respective).
@@ -127,7 +128,7 @@ def import_folder(folder):
             sweep = 'Sweep' + str(i+1).zfill(4)
             sweep_list.append(sweep)
             file_vals = parse_xml(file)
-            
+
             if file_vals['voltage recording file'] is not None:
                 vr_filename = os.path.join(folder,
                                            (file_vals['voltage recording file']
@@ -138,26 +139,27 @@ def import_folder(folder):
 
                 df_vr = import_vr_csv(vr_filename, col_names, primary_divisor,
                                       secondary_divisor)
-                
+
                 data_vr.append(df_vr)
 
             if file_vals['linescan file'] is not None:
-                ls_filename = os.path.join(folder, (file_vals['linescan file']))
+                ls_filename = os.path.join(folder,
+                                           (file_vals['linescan file']))
 
                 df_ls = import_ls_csv(ls_filename)
 
                 data_ls.append(df_ls)
-            
+
             file_attr['File'+str(i+1)] = file_vals
 
         if data_vr:
-            output["voltage recording"] = pd.concat(data_vr, keys=sweep_list, 
+            output["voltage recording"] = pd.concat(data_vr, keys=sweep_list,
                                                     names=['Sweep', 'Index'])
         elif not data_vr:
             output["voltage recording"] = None
         if data_ls:
             output["linescan"] = pd.concat(data_ls, keys=sweep_list,
-                                          names=['Sweep', 'Index'])
+                                           names=['Sweep', 'Index'])
         elif not data_ls:
             output["linescan"] = None
         output["file attributes"] = file_attr
