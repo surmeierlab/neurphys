@@ -8,8 +8,8 @@ def analyze_current(df, bsl_start, bsl_end, start_time, end_time, sign="min",
                     calc_tau=False, tau_plot=False):
     """Calculate peak amplitude and (optionall) decay of a synpaptic current
 
-    Input Parameters
-    -----------------
+    Parameters
+    -----------
     df: data as pandas dataframe
         should contain Time and Primary columns
     bsl_start: positive number (seconds)

@@ -8,8 +8,8 @@ def baseline(df, start_time, end_time):
     """Subtracts from entire data column average of subset of data column
     defined by start and end times.
 
-    Input Parameters
-    ----------------
+    Parameters
+    -----------
     df: data as pandas dataframe
         should contain Time and Primary columns
     start_time: positive number (seconds)
@@ -30,8 +30,8 @@ def baseline(df, start_time, end_time):
 def find_peak(df, start_time, end_time, sign="min"):
     """Returns min (or max) of data subset as a dataframe
 
-    Input Parameters
-    ----------------
+    Parameters
+    -----------
     df: data as pandas dataframe
         should contain Time and Primary columns
     start_time: positive number (seconds)
@@ -56,17 +56,32 @@ def find_peak(df, start_time, end_time, sign="min"):
 
     return peak_df.tail(1)
 
+
 def calc_decay(df, peak, peak_time, return_plot_vals=False):
     """Performs biexponential fit of event, returns a weighted tao value
 
-    df: data as pandas dataframe, should contain Time and Primary columns.
-    *Note that it is assumed that the Primary column in the passed df is assumed
-    to have alredady been baselined
-    peak: amplitude of event
-    peak_time: time at which the peak occurs
-    return_plot_values: if True, will return 1. weighted tao, 2. subset of x
-    values (Time), 3. subet of y values (Primary) and 4. the y-data for the fit.
-    Useful for plotting the fit overlayed with the raw data.
+    Parameters
+    -----------
+    df: data as pandas dataframe
+        should contain Time and Primary columns
+    peak: scalar (pA or mV)
+        amplitude of event
+    peak_time: positive scalar (seconds)
+        time at which the peak occurs
+    return_plot_vals: boolean, default = False
+        return x, y, and fit_y values for fit associated with tau calculation
+
+    Notes
+    -----
+    It is assumed that the Primary column in the passed df have been baselined
+
+    Return
+    ------
+    tau: weighted tau (unit = ms)
+    **if return_plot_values == True:
+        also return subset of 1. x values (Time), 2. subet of
+        y values (Primary) and 3. the y-data for the fit. Useful for plotting
+        the fit overlayed with the raw data.
     """
     peak_sub = df[df.Time >= peak_time]
 
@@ -106,8 +121,20 @@ def calc_decay(df, peak, peak_time, return_plot_vals=False):
 
 
 def simple_smoothing(data, n):
-    """Calculates running average of n data points, returning array of same
-    length as input array but with first n-1 data points set to nan
+    """Calculates running average of n data points
+
+    Parameters
+    ----------
+    data: 1D array
+    n: positive scalar
+
+    Notes
+    -----
+    *to return array of same length as data array, n-1 nan values
+    are placed at the start of the return array
+
+    Return:
+    1D array of same length as input array (data)
     """
     if np.isnan(np.sum(data)):
         starting_nans = data[np.isnan(data)]
