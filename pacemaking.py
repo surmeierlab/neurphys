@@ -42,10 +42,16 @@ def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
 
     See this IPython Notebook [1]_.
 
-    References (Credit to:)
+    References
     ----------
     .. [1] http://nbviewer.ipython.org/github/demotu/BMC/blob/master/notebooks/DetectPeaks.ipynb
 
+    ----------------------------------------------------------------------------
+    Please note, this function is the work of Marcos Duarte.
+
+    Citation:
+    Duarte, M. (2015) Notes on Scientific Computing for Biomechanics and
+    Motor Control. GitHub repository, https://github.com/demotu/BMC.
     """
 
     x = np.atleast_1d(x).astype('float64')

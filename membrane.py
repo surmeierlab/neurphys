@@ -1,15 +1,12 @@
 """ Functions for analyzing membrane properties of a cell """
 
-import numpy as np
-from scipy.optimize import curve_fit
 from scipy.integrate import trapz
 from . import utilities as util
 
 
-def calc_mem_prop(df, bsl_start, bsl_end, pulse_start,
-                             pulse_dur, pulse_amp):
-    """Fit capacitive transient to calculate membrane access resistances (ra), 
-    membrane resistance (rm), membrane capacitance (cm), and membrane time 
+def calc_mem_prop(df, bsl_start, bsl_end, pulse_start, pulse_dur, pulse_amp):
+    """Fit capacitive transient to calculate membrane access resistances (ra),
+    membrane resistance (rm), membrane capacitance (cm), and membrane time
     constant (tau)
 
     Input Parameters
@@ -37,8 +34,8 @@ def calc_mem_prop(df, bsl_start, bsl_end, pulse_start,
     References
     ----------
     For associated equations, see:
-    pClamp 10: Data Acquisition and Analysis for Comprehensive 
-    Electrophysiology - User Guide, pages 163-166. 
+    pClamp 10: Data Acquisition and Analysis for Comprehensive
+    Electrophysiology - User Guide, pages 163-166.
     """
     # have to make copy of df to not modify original df with calculation
     data = df.copy()
@@ -62,7 +59,7 @@ def calc_mem_prop(df, bsl_start, bsl_end, pulse_start,
     # calculate delta_i -- i.e. difference between baseline current amplitude
     # and steady-state current amplitude
     delta_i = (i_ss-i_baseline)
-    
+
     # remove delta_i; this part of the capacitance charge is calculated
     # later as q2
     data.Primary -= delta_i
@@ -70,7 +67,7 @@ def calc_mem_prop(df, bsl_start, bsl_end, pulse_start,
     pulse_end = pulse_start + pulse_dur
     if pulse_amp > 0:
         peak_df = util.find_peak(data, pulse_start, pulse_end, 'max')
-        
+
     elif pulse_amp < 0:
         peak_df = util.find_peak(data, pulse_start, pulse_end, 'min')
 
@@ -78,25 +75,22 @@ def calc_mem_prop(df, bsl_start, bsl_end, pulse_start,
     peak_time = peak_df['Peak Time'].values[0]
     tau, x_vals, y_vals, fit_vals = util.calc_decay(data, peak, peak_time, True)
 
-    #take integral of curve to get q1
+    # take integral of curve to get q1
     q1 = trapz(fit_vals, x_vals)
-    #print("q1: %s" %q1)
 
-    #q2 is correction for charge from i_baseline to i_ss
+    # q2 is correction for charge from i_baseline to i_ss
     q2 = tau * delta_i
-    #print("q2: %s" %q2)
 
-    #total charge
+    # total charge
     qt = q1 + q2
-    #print("qt: %s" %qt)
 
-    #resistance calculations
+    # resistance calculations
     ra = (tau*pulse_amp)/qt
     rt = (pulse_amp)/delta_i
     rm = rt - ra
 
-    #capacitance calculation
+    # capacitance calculation
     cm = (qt * rt) / (pulse_amp * rm)
 
-
     return ra*1e-6, rm*1e-6, cm*1e12, tau*1e3
+x

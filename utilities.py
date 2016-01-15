@@ -130,7 +130,7 @@ def simple_smoothing(data, n):
 
     Notes
     -----
-    *to return array of same length as data array, n-1 nan values
+    to return array of same length as data array, n-1 nan values
     are placed at the start of the return array
 
     Return:
