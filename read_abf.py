@@ -13,7 +13,7 @@ def read_abf(filename):
 
     Parameters
     ----------
-    filename:
+    filename: str
         filename WITH '.abf' extension
 
     Return

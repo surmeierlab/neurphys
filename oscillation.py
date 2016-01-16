@@ -17,16 +17,16 @@ def create_epoch(df, window, step):
     Parameters
     ----------
     df:
-        Pandas Dataframe from 'read_abf' function
-    window:
-        Epoch size based on array index
-    step:
+        Pandas Dataframe from 'read_abf' function.
+    window: int
+        Epoch size based on array index.
+    step: int
         Start-to-start number of rows between captured windows (may
-        overlap with other windows)
+        overlap with other windows).
 
     Returns
     -------
-    Multiindexed Pandas DataFrame with column names unchanged, and an
+    Multiindexed Pandas DataFrame with column names unchanged and an
     added index level named 'epoch.'
 
     Notes
@@ -45,12 +45,12 @@ def create_epoch(df, window, step):
     num_epochs = int(1 + (num_rows - window) / step)
     sweep_list = []
     sweeps = df.index.levels[0].values
-    sweeps_names = ['sweep' + str(i + 1).zfill(3) for i in range(len(sweeps))]
+    sweep_names = ['sweep' + str(i + 1).zfill(3) for i in range(len(sweeps))]
     epoch_names = ['epoch' + str(i + 1).zfill(3) for i in range(num_epochs)]
     idx = np.arange(window)
     arrays = [sweep_names,epoch_names,idx]
     index = pd.MultiIndex.from_product(arrays,names=['sweep','epoch',None])
-
+    
     for sweep in sweeps:
         sweep_values = df.ix[sweep].values
         epoch_data = np.array([sweep_values[(0 + step * i):(window + step * i)] for i in range(num_epochs)])
@@ -70,15 +70,15 @@ def epoch_hist(epoch_df, channel, hist_min, hist_max, num_bins):
     Parameters
     ----------
     epoch_df:
-        Dataframe from 'create_epoch' function
-    channel:
-        Channel column to be analyzed
-    hist_min:
-        Minimum of histogram bin range
-    hist_max:
-        Maximum of histogram bin range
-    num_bins:
-        Number of histogram bins
+        Dataframe from 'create_epoch' function.
+    channel: str
+        Channel column to be analyzed.
+    hist_min: int/float
+        Minimum of histogram bin range.
+    hist_max: int/float
+        Maximum of histogram bin range.
+    num_bins: int
+        Number of histogram bins.
 
     Returns
     -------
@@ -91,7 +91,6 @@ def epoch_hist(epoch_df, channel, hist_min, hist_max, num_bins):
     """
     hist_arrays = []
     bin_arrays = []
-
     sweep_names = epoch_df.index.levels[0].values
     epoch_names = epoch_df.index.levels[1].values
     idx = np.arange(num_bins)
@@ -113,7 +112,7 @@ def epoch_hist(epoch_df, channel, hist_min, hist_max, num_bins):
     return df
 
 
-def epoch_kde(epoch_df, channel, range_min, range_max, resolution=1000):
+def epoch_kde(epoch_df, channel, range_min, range_max, resolution=None):
     """
     Returns a 1D kernel density estimation with automatic bandwidth
     detection for each of the epochs created from the 'create_epoch'
@@ -122,15 +121,16 @@ def epoch_kde(epoch_df, channel, range_min, range_max, resolution=1000):
     Parameters
     ----------
     epoch_df:
-        Dataframe from 'create_epoch' function
-    channel:
-        Channel column to be analyzed
-    range_min:
-        Minimum of KDE range
-    range_max:
-        Maximum of KDE range
-    resolution:
-        Determines KDE resolution. Don't muck around with this.
+        Dataframe from 'create_epoch' function.
+    channel: str
+        Channel column to be analyzed.
+    range_min: int/float
+        Minimum of KDE range.
+    range_max: int/float
+        Maximum of KDE range.
+    resolution: int (default: None)
+        Determines KDE resolution. >1000 gives very detailed KDEs, but
+        the default setting is a great tradeoff with speed. 
 
     Returns
     -------
@@ -146,7 +146,10 @@ def epoch_kde(epoch_df, channel, range_min, range_max, resolution=1000):
     
     kde_arrays = []
     x_arrays = []
-    resolution = resolution
+    if resolution == None:
+        resolution = abs(range_min - range_max) * 5
+    else:
+        resolution = resolution
     sweep_names = epoch_df.index.levels[0].values
     epoch_names = epoch_df.index.levels[1].values
     idx = np.arange(resolution)
@@ -156,7 +159,7 @@ def epoch_kde(epoch_df, channel, range_min, range_max, resolution=1000):
     epoch_size = epoch_df.ix['sweep001'][channel].xs('epoch001').size
     x = np.linspace(range_min, range_max, resolution)
     data = epoch_df[channel].values
-    
+
     for i in range(total_epochs):
         kde = gaussian_kde(data[(i*epoch_size):((i+1)*epoch_size)])
         kde_data = kde(x)
@@ -178,11 +181,11 @@ def epoch_pgram(epoch_df, channel, fs=10e3):
     Parameters
     ----------
     epoch_df:
-        Dataframe from 'create_epoch' function
-    channel:
-        Channel column to be analyzed
-    fs:
-        Sampling frequency
+        Dataframe from 'create_epoch' function.
+    channel: str
+        Channel column to be analyzed.
+    fs: int (default: 10000)
+        Sampling frequency (Hz).
 
     Returns
     -------
