@@ -51,10 +51,10 @@ def find_peak(df, start_time, end_time, sign="min"):
     elif sign == "max":
         peak = df_sub.Primary.max()
 
-    peak_df = df[df.Primary == peak][['Time', 'Primary']]
+    peak_df = df_sub[df_sub.Primary == peak][['Time', 'Primary']]
     peak_df.columns = ['Peak Time', 'Peak Amp']
 
-    return peak_df.tail(1)
+    return peak_df.head(1)
 
 
 def calc_decay(df, peak, peak_time, return_plot_vals=False):
