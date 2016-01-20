@@ -107,11 +107,22 @@ def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
     return ind
 
 
-def calc_frequency(time_array, indexes, hz=True):
-    times = time_array[indexes]
+def calc_freq(df, mph, hz=True, ret_indices=False, ret_times=False):
+    """Calculate instantaneous frequency of events exceeding a specific height
+    """
+    ret_vals = []
+    indices = detect_peaks(df['Primary'].values, mph=mph, mpd=100)
+    times = df['Time'].ix[indices].values
     times_dif = times[1:] - times[:-1]
 
     if hz:
-        return times[1:], 1/times_dif
+        ret_vals.append(1/times_dif)
     else:
-        return times[1:], times_dif
+        ret_vals.append(times_dif)
+
+    if ret_indices:
+        ret_vals.append(indices)
+    if ret_times:
+        ret_vals.append(times[1:])
+
+    return ret_vals[0] if len(ret_vals) == 1 else ret_vals
