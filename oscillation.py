@@ -16,7 +16,7 @@ def create_epoch(df, window, step):
 
     Parameters
     ----------
-    df:
+    df: DataFrame
         Pandas Dataframe from 'read_abf' function.
     window: int
         Epoch size based on array index.
@@ -26,8 +26,9 @@ def create_epoch(df, window, step):
 
     Returns
     -------
-    Multiindexed Pandas DataFrame with column names unchanged and an
-    added index level named 'epoch.'
+    epoch_df: DataFrame
+        Multiindexed Pandas DataFrame with column names unchanged and
+        an added index level named 'epoch.'
 
     Notes
     -----
@@ -69,7 +70,7 @@ def epoch_hist(epoch_df, channel, hist_min, hist_max, num_bins):
 
     Parameters
     ----------
-    epoch_df:
+    epoch_df: DataFrame
         Dataframe from 'create_epoch' function.
     channel: str
         Channel column to be analyzed.
@@ -82,13 +83,15 @@ def epoch_hist(epoch_df, channel, hist_min, hist_max, num_bins):
 
     Returns
     -------
-    Multiindexed Pandas DataFrame with index levels unchanged, but with
-    an added column specifiying the bin for each value.
+    df: DataFrame
+        Multiindexed Pandas DataFrame with index levels unchanged, but
+        with an added column specifiying the bin for each value.
 
     Notes
     -----
     'bins' column contains the 'leftmost' (smallest?) bin edge.
     """
+    
     hist_arrays = []
     bin_arrays = []
     sweep_names = epoch_df.index.levels[0].values
@@ -120,7 +123,7 @@ def epoch_kde(epoch_df, channel, range_min, range_max, resolution=None):
 
     Parameters
     ----------
-    epoch_df:
+    epoch_df: Dataframe
         Dataframe from 'create_epoch' function.
     channel: str
         Channel column to be analyzed.
@@ -134,10 +137,11 @@ def epoch_kde(epoch_df, channel, range_min, range_max, resolution=None):
 
     Returns
     -------
-    Multiindexed Pandas DataFrame with index levels unchanged, but with
-    an added column specifiying the x value for each corresponding
-    density value (similar to the 'bin' in the histogram function, but
-        not the same)
+    df: Dataframe
+        Multiindexed Pandas DataFrame with index levels unchanged, but
+        with an added column specifiying the x value for each
+        corresponding density value (similar to the 'bin' in the
+        histogram function, but not exactly the same)
 
     References
     ----------
@@ -180,7 +184,7 @@ def epoch_pgram(epoch_df, channel, fs=10e3):
 
     Parameters
     ----------
-    epoch_df:
+    epoch_df: Dataframe
         Dataframe from 'create_epoch' function.
     channel: str
         Channel column to be analyzed.
@@ -189,7 +193,10 @@ def epoch_pgram(epoch_df, channel, fs=10e3):
 
     Returns
     -------
-    Multiindexed Pandas DataFrame.
+    df: Dataframe
+        Multiindexed Pandas DataFrame with the estimated power spectral
+        density (V^2/Hz) and frequency as the new column names. All
+        indexing from the input DataFrame remain unchanged. 
 
     References
     ----------
@@ -199,7 +206,6 @@ def epoch_pgram(epoch_df, channel, fs=10e3):
     pgram_f_arrays = []
     pgram_den_arrays = []
     fs = int(fs)
-
     sweep_names = epoch_df.index.levels[0].values
     epoch_names = epoch_df.index.levels[1].values
     total_epochs = len(sweep_names)*len(epoch_names)
