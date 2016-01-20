@@ -16,9 +16,10 @@ def read_abf(filename):
     filename: str
         filename WITH '.abf' extension
 
-    Return
-    ------
-    Pandas DataFrame brokend down by sweep
+    Returns
+    ------_
+    df: DataFrame
+        Pandas DataFrame broken down by sweep
 
     References
     ----------
@@ -28,19 +29,21 @@ def read_abf(filename):
     r = io.AxonIO(filename = filename)
     bl = r.read_block(lazy=False, cascade=True)
     num_channels = len(bl.segments[0].analogsignals)
-    channels = []
+    channels = ['Primary']
     signals = []
     df_list = []
     sweep_list = []
 
     for seg_num, seg in enumerate(bl.segments):
         for i in range(num_channels):
-            channels.append('channel_' + str(i))
             signals.append(bl.segments[seg_num].analogsignals[i])
+            if i >= 1:
+                channels.append('channel_' + str(i))
         data_dict = dict(zip(channels, signals))
         time = seg.analogsignals[0].times - seg.analogsignals[0].times[0]
         data_dict['time'] = time
         df = pd.DataFrame(data_dict)
         df_list.append(df)
         sweep_list.append('sweep' + str(seg_num + 1).zfill(3))
-    return pd.concat(df_list, keys=sweep_list, names=['sweep'])
+        df = pd.concat(df_list, keys=sweep_list, names=['sweep'])
+    return df
