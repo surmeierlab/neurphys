@@ -93,4 +93,3 @@ def calc_mem_prop(df, bsl_start, bsl_end, pulse_start, pulse_dur, pulse_amp):
     cm = (qt * rt) / (pulse_amp * rm)
 
     return ra*1e-6, rm*1e-6, cm*1e12, tau*1e3
-x
