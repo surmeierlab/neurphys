@@ -29,7 +29,7 @@ def calc_ca_conc(df, profile_num, f0_start, f0_end, background,
 
     Return
     ------
-    1D array of calcium concentration values
+    1D array of calcium concentration (nM) values
     """
 
     prof = "Prof " + str(profile_num)
