@@ -6,8 +6,8 @@ import pandas as pd
 
 def read_abf(filename):
     """
-    Imports ABF file using neo io AxonIO, breaks it down by blocks 
-    which are then processed into a multidimensional pandas dataframe 
+    Imports ABF file using neo io AxonIO, breaks it down by blocks
+    which are then processed into a multidimensional pandas dataframe
     where each block corresponds to a sweep and columns represent time
     and each recorded channel.
 
@@ -29,7 +29,7 @@ def read_abf(filename):
     r = io.AxonIO(filename = filename)
     bl = r.read_block(lazy=False, cascade=True)
     num_channels = len(bl.segments[0].analogsignals)
-    channels = ['Primary']
+    channels = ['primary']
     signals = []
     df_list = []
     sweep_list = []
@@ -45,5 +45,5 @@ def read_abf(filename):
         df = pd.DataFrame(data_dict)
         df_list.append(df)
         sweep_list.append('sweep' + str(seg_num + 1).zfill(3))
-        df = pd.concat(df_list, keys=sweep_list, names=['sweep'])
+    df = pd.concat(df_list, keys=sweep_list, names=['sweep'])
     return df
