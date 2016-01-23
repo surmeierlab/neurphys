@@ -40,7 +40,7 @@ def analyze_current(df, bsl_start, bsl_end, start_time, end_time, sign="min",
     calc_tau hasn't been set to True
     """
     df_bsl = util.baseline(df, bsl_start, bsl_end)
-    peak_df = util.find_peak(df_bsl, start_time, end_time)
+    peak_df = util.find_peak(df_bsl, start_time, end_time, sign=sign)
 
     if tau_plot:
         peak = peak_df['Peak Amp'].values[0]
