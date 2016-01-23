@@ -115,7 +115,7 @@ def import_folder(folder):
     "file attributes" keys associate with 2 dataframes and a dictionary
     (respective).
     """
-    vr_xmls = glob(os.path.join(folder, '*_VoltageRecording_*.xml'))
+    vr_xmls = sorted(glob(os.path.join(folder, '*_VoltageRecording_*.xml')))
 
     if any(vr_xmls):
         data_vr = []
