@@ -9,6 +9,7 @@ Neurphys (pronounced "nervous") is an IO and analysis package built to streamlin
 - [scipy](http://www.scipy.org/)
 - [pandas](http://pandas.pydata.org/)
 - [neo](https://pythonhosted.org/neo/)
+- [lxml](http://lxml.de/)
 
 
 ## Installation
