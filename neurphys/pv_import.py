@@ -8,6 +8,9 @@ from glob import glob
 
 
 def _get_ephys_vals(element):
+    """Gets conversion values for primary and secondary
+    Multiclamp channels"""
+
     ch_type = element.find('.//PatchclampChannel').text
 
     if ch_type == '0':
@@ -24,6 +27,8 @@ def _get_ephys_vals(element):
 
 
 def parse_xml(filename):
+    """Parses VoltageRecording .xml file to get experiment metadata"""
+
     tree = etree.parse(filename)
     # find all elements associated with enabled channels
     enabled_ch = tree.xpath('.//Enabled[text()="true"]')
@@ -111,9 +116,21 @@ def import_ls_csv(filename):
 def import_folder(folder):
     """Collapse entire data folder into multidimensional dataframe
 
-    Returns a dictionary with "voltage recording", "linescan" and
-    "file attributes" keys associate with 2 dataframes and a dictionary
-    (respective).
+    Parameters
+    ----------
+    folder: string
+        Full path to data folder. Folder must contain, at a minimum
+        a single VoltageRecording XML file and associated csv file
+
+    Return
+    ------
+    output: dictionary
+        keys: 'voltage recording': contains voltage recording dataframe (if any
+               voltage recording data in folder)
+              'linescan': contains linescane dataframe (if any line scan data
+               data in folder)
+              'file attributes': dictionary of contain file: file attribute
+               key: value pairs (file attributes from parsing XML)
     """
     vr_xmls = sorted(glob(os.path.join(folder, '*_VoltageRecording_*.xml')))
 
