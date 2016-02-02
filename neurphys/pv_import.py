@@ -42,7 +42,7 @@ def parse_xml(filename):
             else:
                 name = parent.find('.//Name').text
 
-            ch_names.append(name.capitalize())
+            ch_names.append(name.lower())
 
     file_attr['channels'] = ch_names
     # gets sampling rate
@@ -77,19 +77,19 @@ def parse_xml(filename):
 def import_vr_csv(filename, col_names, primary_div=1, secondary_div=1):
     """
     Reads voltage recording .csv file into a pandas dataframe.
-    Will convert Primary and Secondary channels to appropriate values if those
+    Will convert primary and secondary channels to appropriate values if those
     channels are in the file.
 
     Returns a dataframe
     """
 
     df = pd.read_csv(filename, names=col_names, skiprows=1)
-    df.Time /= 1000
+    df.time /= 1000
 
-    if "Primary" in df.columns:
-        df.Primary /= primary_div
-    if "Secondary" in df.columns:
-        df.Secondary /= secondary_div
+    if "primary" in df.columns:
+        df.primary /= primary_div
+    if "secondary" in df.columns:
+        df.secondary /= secondary_div
 
     return df
 
@@ -133,7 +133,7 @@ def import_folder(folder):
                 vr_filename = os.path.join(folder,
                                            (file_vals['voltage recording file']
                                             + '.csv'))
-                col_names = ['Time'] + file_vals['channels']
+                col_names = ['time'] + file_vals['channels']
                 primary_divisor = file_vals['primary']['divisor']
                 secondary_divisor = file_vals['secondary']['divisor']
 
