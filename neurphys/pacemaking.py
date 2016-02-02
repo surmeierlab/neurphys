@@ -1,5 +1,6 @@
 """ Functions to analyze pacemaking activity data """
 import numpy as np
+import utilities as util
 
 
 def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
@@ -71,14 +72,17 @@ def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
         ine = np.where((np.hstack((dx, 0)) < 0) & (np.hstack((0, dx)) > 0))[0]
     else:
         if edge.lower() in ['rising', 'both']:
-            ire = np.where((np.hstack((dx, 0)) <= 0) & (np.hstack((0, dx)) > 0))[0]
+            ire = np.where((np.hstack((dx, 0)) <= 0) &
+                           (np.hstack((0, dx)) > 0))[0]
         if edge.lower() in ['falling', 'both']:
-            ife = np.where((np.hstack((dx, 0)) < 0) & (np.hstack((0, dx)) >= 0))[0]
+            ife = np.where((np.hstack((dx, 0)) < 0) &
+                           (np.hstack((0, dx)) >= 0))[0]
     ind = np.unique(np.hstack((ine, ire, ife)))
     # handle NaN's
     if ind.size and indnan.size:
         # NaN's and values close to NaN's cannot be peaks
-        ind = ind[np.in1d(ind, np.unique(np.hstack((indnan, indnan-1, indnan+1))), invert=True)]
+        ind = ind[np.in1d(ind, np.unique(np.hstack((indnan, indnan-1,
+                                                    indnan+1))), invert=True)]
     # first and last values of x cannot be peaks
     if ind.size and ind[0] == 0:
         ind = ind[1:]
@@ -107,11 +111,68 @@ def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
     return ind
 
 
-def calc_freq(df, mph, hz=True, ret_indices=False, ret_times=False):
+def baseline_pacemaking(df, n=200):
+    """Baseline a pacemaking (cell attached) trace by subtracting the running
+    average of the trace from the trace
+
+    Parameters
+    ----------
+    df: data as pandas dataframe
+        should contain time and primary columns
+    n:  positive scalar, default = 200
+        number of points to average for running average
+
+    Return
+    ------
+    df: modified dataframe where primary column has been baselined
+
+    Notes
+    -----
+    Simple_smoothing sets n-1 points to nan, which this function then sets to 0
+    before subtracting from the data column. What this means is that those n-1
+    values are not baselined. At the sampling frequencies normally used this
+    should not be a major concern, though.
+    """
+    smoothed = util.simple_smoothing(df.primary.values, n)
+    df.primary -= np.nan_to_num(smoothed)
+
+    return df
+
+
+def calc_freq(df, mph, valley=False, hz=True,
+              ret_indices=False, ret_times=False):
     """Calculate instantaneous frequency of events exceeding a specific height
+
+    Parameters
+    ----------
+    df: data as pandas dataframe
+        should contain Time and Primary columns
+    mph: number (pA or mV)
+        designates minimum height of event (i.e. threshold of event)
+    valley : boolean, default = False
+        if True, detect valleys (local minima) instead of peaks
+    hz: boolean, default = True
+        return frequency in Hz; if False, will return as ISI (seconds)
+    ret_indices: boolean, default = False
+        return the indices for the detected events
+    ret_times: boolean, default = False
+        return the times for the detected events
+
+    Return
+    ------
+    if ret_indices == False and ret_times == False, return just
+    frequencies (array)
+
+    otherwise, will return a list (ret_vals) where ret_vals[0] is the
+    frequency array. indices and times are returned ordered in that
+    order in list if both are desired (i.e. ret_vals[1] and ret_vals[2])
     """
     ret_vals = []
-    indices = detect_peaks(df['Primary'].values, mph=mph, mpd=100)
+    if valley:
+        indices = detect_peaks(df['Primary'].values, mph=abs(mph),
+                               valley=valley, mpd=100)
+    else:
+        indices = detect_peaks(df['Primary'].values, mph=mph, mpd=100)
     times = df['Time'].ix[indices].values
     times_dif = times[1:] - times[:-1]
 
