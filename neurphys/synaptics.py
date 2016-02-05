@@ -11,7 +11,7 @@ def analyze_current(df, bsl_start, bsl_end, start_time, end_time, sign="min",
     Parameters
     -----------
     df: data as pandas dataframe
-        should contain Time and Primary columns
+        should contain time and primary columns
     bsl_start: positive number (seconds)
         designates beginning of epoch to use to baseline data
     bsl_end: positive number (seconds)
@@ -29,12 +29,12 @@ def analyze_current(df, bsl_start, bsl_end, start_time, end_time, sign="min",
 
     Return
     ------
-    peak_df: dataframe of Peak Amp and Peak Time
+    peak_df: dataframe of Peak Amp and Peak time
     **if calc_tau == True:
          also return weighted tau (unit = ms)
     **if tau_plot == True:
-         also return subset of 1. x values (Time), 2. subet of
-         y values (Primary) and 3. the y-data for the fit. Useful for plotting
+         also return subset of 1. x values (time), 2. subet of
+         y values (primary) and 3. the y-data for the fit. Useful for plotting
          the fit overlayed with the raw data.
     ***Note that if tau_plot is True, weighted tau will be returned even if
     calc_tau hasn't been set to True
@@ -44,14 +44,14 @@ def analyze_current(df, bsl_start, bsl_end, start_time, end_time, sign="min",
 
     if tau_plot:
         peak = peak_df['Peak Amp'].values[0]
-        peak_time = peak_df['Peak Time'].values[0]
+        peak_time = peak_df['Peak time'].values[0]
         tau, x_vals, y_vals, fit_vals = util.calc_decay(df_bsl, peak,
                                                         peak_time, tau_plot)
         return peak_df, tau*1e3, x_vals, y_vals, fit_vals
 
     elif calc_tau:
         peak = peak_df['Peak Amp'].values[0]
-        peak_time = peak_df['Peak Time'].values[0]
+        peak_time = peak_df['Peak time'].values[0]
         tau = util.calc_decay(df_bsl, peak, peak_time)
         return peak_df, tau*1e3
 
@@ -66,7 +66,7 @@ def calc_ppr(df, bsl_start, bsl_end, start_time, end_time, stim_interval,
     Input Parameters
     -----------------
     df: data as pandas dataframe
-        should contain Time and Primary columns
+        should contain time and primary columns
     bsl_start: positive number (seconds)
         designates beginning of epoch to use to baseline data
     bsl_end: positive number (seconds)
