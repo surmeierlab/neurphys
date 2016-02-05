@@ -11,7 +11,7 @@ def baseline(df, start_time, end_time):
     Parameters
     -----------
     df: data as pandas dataframe
-        should contain Time and Primary columns
+        should contain time and primary columns
     start_time: positive number (seconds)
         designates beginning of the region over which to average
     end_time: positive number (seconds)
@@ -19,10 +19,10 @@ def baseline(df, start_time, end_time):
 
     Return
     ------
-    df: dataframe with modified Primary column
+    df: dataframe with modified primary column
     """
-    avg = df.Primary[(df.Time >= start_time) & (df.Time <= end_time)].mean()
-    df.Primary -= avg
+    avg = df.primary[(df.time >= start_time) & (df.time <= end_time)].mean()
+    df.primary -= avg
 
     return df
 
@@ -33,7 +33,7 @@ def find_peak(df, start_time, end_time, sign="min"):
     Parameters
     -----------
     df: data as pandas dataframe
-        should contain Time and Primary columns
+        should contain time and primary columns
     start_time: positive number (seconds)
         designates beginning of the epoch in which the event occurs
     end_time: positive number (seconds)
@@ -43,16 +43,16 @@ def find_peak(df, start_time, end_time, sign="min"):
 
     Return
     -------
-    peak_df: dataframe of Peak Amp and Peak Time
+    peak_df: dataframe of Peak Amp and Peak time
     """
-    df_sub = df[(df.Time >= start_time) & (df.Time <= end_time)]
+    df_sub = df[(df.time >= start_time) & (df.time <= end_time)]
     if sign == "min":
-        peak = df_sub.Primary.min()
+        peak = df_sub.primary.min()
     elif sign == "max":
-        peak = df_sub.Primary.max()
+        peak = df_sub.primary.max()
 
-    peak_df = df_sub[df_sub.Primary == peak][['Time', 'Primary']]
-    peak_df.columns = ['Peak Time', 'Peak Amp']
+    peak_df = df_sub[df_sub.primary == peak][['time', 'primary']]
+    peak_df.columns = ['Peak time', 'Peak Amp']
 
     return peak_df.head(1)
 
@@ -63,7 +63,7 @@ def calc_decay(df, peak, peak_time, return_plot_vals=False):
     Parameters
     -----------
     df: data as pandas dataframe
-        should contain Time and Primary columns
+        should contain time and primary columns
     peak: scalar (pA or mV)
         amplitude of event
     peak_time: positive scalar (seconds)
@@ -73,38 +73,38 @@ def calc_decay(df, peak, peak_time, return_plot_vals=False):
 
     Notes
     -----
-    It is assumed that the Primary column in the passed df have been baselined
+    It is assumed that the primary column in the passed df have been baselined
 
     Return
     ------
     tau: weighted tau (unit = ms)
     **if return_plot_values == True:
-        also return subset of 1. x values (Time), 2. subet of
-        y values (Primary) and 3. the y-data for the fit. Useful for plotting
+        also return subset of 1. x values (time), 2. subet of
+        y values (primary) and 3. the y-data for the fit. Useful for plotting
         the fit overlayed with the raw data.
     """
-    peak_sub = df[df.Time >= peak_time]
+    peak_sub = df[df.time >= peak_time]
 
     if peak < 0:
-        index1 = peak_sub[peak_sub.Primary >= peak * 0.90].index[0]
-        index2 = peak_sub[peak_sub.Primary >= peak * 0.05].index[0]
+        index1 = peak_sub[peak_sub.primary >= peak * 0.90].index[0]
+        index2 = peak_sub[peak_sub.primary >= peak * 0.05].index[0]
         fit_sub = peak_sub.ix[index1:index2]
         guess = np.array([-1, 1e3, -1, 1e3])
 
     else:
-        index1 = peak_sub[peak_sub.Primary <= peak * 0.90].index[0]
-        index2 = peak_sub[peak_sub.Primary <= peak * 0.05].index[0]
+        index1 = peak_sub[peak_sub.primary <= peak * 0.90].index[0]
+        index2 = peak_sub[peak_sub.primary <= peak * 0.05].index[0]
         fit_sub = peak_sub.ix[index1:index2]
         guess = np.array([1, 1e3, 1, 1e3])
 
-    x_zeroed = fit_sub.Time - fit_sub.Time.values[0]
+    x_zeroed = fit_sub.time - fit_sub.time.values[0]
 
     def exp_decay(x, a, b, c, d):
         return a*np.exp(-b*x) + c*np.exp(-d*x)
 
-    popt, pcov = curve_fit(exp_decay, x_zeroed, fit_sub.Primary, guess)
+    popt, pcov = curve_fit(exp_decay, x_zeroed, fit_sub.primary, guess)
 
-    x_full_zeroed = peak_sub.Time - peak_sub.Time.values[0]
+    x_full_zeroed = peak_sub.time - peak_sub.time.values[0]
     y_curve = exp_decay(x_full_zeroed, *popt)
 
     amp1 = popt[0]
@@ -115,7 +115,7 @@ def calc_decay(df, peak, peak_time, return_plot_vals=False):
     tau = ((tau1*amp1)+(tau2*amp2))/(amp1+amp2)
 
     if return_plot_vals:
-        return tau, x_full_zeroed, peak_sub.Primary, y_curve
+        return tau, x_full_zeroed, peak_sub.primary, y_curve
     else:
         return tau
 
