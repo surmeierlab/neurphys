@@ -12,7 +12,7 @@ def calc_mem_prop(df, bsl_start, bsl_end, pulse_start, pulse_dur, pulse_amp):
     Input Parameters
     -----------------
     df: data as pandas dataframe
-        should contain Time and Primary columns
+        should contain time and primary columns
     bsl_start: positive number (time, seconds)
         designates beginning of epoch to use to baseline data
     bsl_end: positive number (time, seconds)
@@ -40,21 +40,21 @@ def calc_mem_prop(df, bsl_start, bsl_end, pulse_start, pulse_dur, pulse_amp):
     # have to make copy of df to not modify original df with calculation
     data = df.copy()
 
-    # conversions - pulse_amp is in mVs, data.Primary is in pAs
+    # conversions - pulse_amp is in mVs, data.primary is in pAs
     pulse_amp *= 1e-3
-    data.Primary *= 1e-12
+    data.primary *= 1e-12
 
     # baseline recording data
     data = util.baseline(data, bsl_start, bsl_end)
 
     # i_baseline is defined as average current over baseline region
-    i_baseline = data.Primary[(data.Time >= bsl_start) &
-                              (data.Time <= bsl_end)].mean()
+    i_baseline = data.primary[(data.time >= bsl_start) &
+                              (data.time <= bsl_end)].mean()
 
     # i_ss is the stead-state current during the pulse, taken between 70% and
     # 90% of pulse duration
-    i_ss = data.Primary[(data.Time >= pulse_start + pulse_dur*0.7) &
-                        (data.Time <= pulse_start + pulse_dur*0.9)].mean()
+    i_ss = data.primary[(data.time >= pulse_start + pulse_dur*0.7) &
+                        (data.time <= pulse_start + pulse_dur*0.9)].mean()
 
     # calculate delta_i -- i.e. difference between baseline current amplitude
     # and steady-state current amplitude
@@ -62,7 +62,7 @@ def calc_mem_prop(df, bsl_start, bsl_end, pulse_start, pulse_dur, pulse_amp):
 
     # remove delta_i; this part of the capacitance charge is calculated
     # later as q2
-    data.Primary -= delta_i
+    data.primary -= delta_i
 
     pulse_end = pulse_start + pulse_dur
     if pulse_amp > 0:
@@ -72,7 +72,7 @@ def calc_mem_prop(df, bsl_start, bsl_end, pulse_start, pulse_dur, pulse_amp):
         peak_df = util.find_peak(data, pulse_start, pulse_end, 'min')
 
     peak = peak_df['Peak Amp'].values[0]
-    peak_time = peak_df['Peak Time'].values[0]
+    peak_time = peak_df['Peak time'].values[0]
     tau, x_vals, y_vals, fit_vals = util.calc_decay(data, peak, peak_time, True)
 
     # take integral of curve to get q1

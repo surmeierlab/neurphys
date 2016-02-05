@@ -146,7 +146,7 @@ def calc_freq(df, mph, valley=False, hz=True,
     Parameters
     ----------
     df: data as pandas dataframe
-        should contain Time and Primary columns
+        should contain time and Primary columns
     mph: number (pA or mV)
         designates minimum height of event (i.e. threshold of event)
     valley : boolean, default = False

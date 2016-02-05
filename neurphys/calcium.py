@@ -10,7 +10,7 @@ def calc_ca_conc(df, profile_num, f0_start, f0_end, background,
     -----------
     df: data as pandas dataframe
         Profiles are named with the convention Prof 1, Prof 2, etc. with
-        corresponding Prof 1 Time, Prof 2 Time, etc. columns
+        corresponding Prof 1 time, Prof 2 time, etc. columns
     profile_num: positive number
         Profile number (1, 2, etc) that identifies which profile contains the
         fluorescent values to be used to calculate calcium concentration
@@ -33,7 +33,7 @@ def calc_ca_conc(df, profile_num, f0_start, f0_end, background,
     """
 
     prof = "Prof " + str(profile_num)
-    prof_time = prof + " Time"
+    prof_time = prof + " time"
 
     ca_df = df[[prof, prof_time]].copy()
     ca_df[prof] -= background
