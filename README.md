@@ -1,6 +1,6 @@
 # Neurphys
 
-Neurphys (pronounced "nervous") is an IO and analysis package built to streamline and standardize the data handling, analysis, and visualization of electrophysiology and calcium imaging data for the members of the [Surmeier lab](http://physio.northwestern.edu/).
+Neurphys (pronounced "nervous") is an IO and analysis package built to streamline and standardize the data handling, analysis, and visualization of electrophysiology and calcium imaging data.
 
 
 ## Dependencies
@@ -15,21 +15,21 @@ Neurphys (pronounced "nervous") is an IO and analysis package built to streamlin
 ## Installation
 
 First, download [Anaconda](https://www.continuum.io/downloads) which will come with
-most required libraries including `numpy`, `pandas`, `scipy`. 
+most required libraries including `numpy`, `pandas`, `scipy`.
 Then download or clone the repository using `git` as follows,
 
 ```bash
 git clone https://github.com/surmeierlab/neurphys
 ```
 
-You can download dependencies which we provide in `requirements.txt`. Use `pip` to install 
+You can download dependencies which we provide in `requirements.txt`. Use `pip` to install
 the rest of dependencies i.e.
 
 ```bash
 pip install -r requirements.txt
 ```
 
-For now, you have to add the package into python environment by adding path to `.bash_profile` or 
+For now, you have to add the package into python environment by adding path to `.bash_profile` or
 `.bashrc` in order to import and use `neurphys` library.
 
 ```python
