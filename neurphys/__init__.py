@@ -16,4 +16,4 @@ from .oscillation import create_epoch, epoch_hist, epoch_kde, epoch_pgram
 from .pacemaking import detect_peaks, baseline_pacemaking, calc_freq
 from .read_abf import read_abf, keep_sweeps, drop_sweeps
 from .read_pv import parse_xml, import_vr_csv, import_ls_csv, import_folder
-# from .synaptics import analyze_current, calc_ppr
+from .synaptics import analyze_current, calc_ppr
