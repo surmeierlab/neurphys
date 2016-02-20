@@ -1,7 +1,7 @@
 """ Functions to analyze synaptic events """
 
 import pandas as pd
-import utilities as util
+from . import utilities as util
 
 
 def analyze_current(df, bsl_start, bsl_end, start_time, end_time, sign="min",
