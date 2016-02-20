@@ -1,6 +1,7 @@
 """ Functions to analyze pacemaking activity data """
+
 import numpy as np
-import utilities as util
+from . import utilities as util
 
 
 def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
