@@ -10,6 +10,7 @@ __version__ = '0.0'
 
 from .calcium import calc_ca_conc
 from .membrane import calc_mem_prop
+from .nuplot import simple_axis, simple_figure, clean_axis, clean_figure, nu_legend, nu_boxplot, nu_scatter, nu_raster
 from .oscillation import create_epoch, epoch_hist, epoch_kde, epoch_pgram
 from .pv_import import parse_xml, import_vr_csv, import_ls_csv, import_folder
 from .read_abf import read_abf, keep_sweeps, drop_sweeps
