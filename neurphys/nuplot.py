@@ -305,7 +305,7 @@ def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05, ma
     # make final changes to plot to clean it up and make it pretty
     ax.set_xlim(0.5, column_num+0.5)
     ax.xaxis.set_ticks(np.arange(1, column_num+1))
-    ax.xaxis.set_ticklabels(labels, rotation=45)
+    ax.xaxis.set_ticklabels(labels, rotation=45, horizontalalignment='right')
     simple_axis(ax)
     return sc
 
