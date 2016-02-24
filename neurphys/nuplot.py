@@ -216,7 +216,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
     for key, val in y_hline.items():
         ax.axhline(y=val,color='grey',linestyle='dotted')
     # make final changes to plot to clean it up and make it pretty
-    ax.xaxis.set_ticklabels(labels, rotation=45)
+    ax.xaxis.set_ticklabels(labels, rotation=45, horizontalalignment='right')
     simple_axis(ax)
     if no_x:
         ax.spines['bottom'].set_visible(False)
