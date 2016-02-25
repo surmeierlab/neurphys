@@ -275,7 +275,12 @@ def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05, ma
         color_cycler = cycler('color',color_list)
     else:
         color_cycler = cycler('color',[i['color'] for i in mpl.rcParams['axes.prop_cycle']])
-    # create the base plot
+    # need to draw paired lines first for stacking purposes
+    if paired:
+        for i in range(len(df)):
+            ax.plot(np.arange(1,column_num+1),df.ix[i],
+                    color='grey')
+    # create the scatter plot
     for i, color_dict in zip(range(column_num), cycle(color_cycler)):
         if column_num == 1:
             y = data
@@ -297,11 +302,6 @@ def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05, ma
                      markeredgewidth=0)
         if monocolor:
             mpl.artist.setp(sc[0], markeredgecolor=monocolor,markerfacecolor=monocolor)
-    # draw a line connecting dots
-    if paired:
-        for i in range(len(df)):
-            ax.plot(np.arange(1,column_num+1),df.ix[i],
-                    color='grey')
     # make final changes to plot to clean it up and make it pretty
     ax.set_xlim(0.5, column_num+0.5)
     ax.xaxis.set_ticks(np.arange(1, column_num+1))
