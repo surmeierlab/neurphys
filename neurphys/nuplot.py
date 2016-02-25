@@ -193,7 +193,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
         color_cycler = cycler('color',color_list)
     else:
         color_cycler = cycler('color',[i['color'] for i in mpl.rcParams['axes.prop_cycle']])
-    # start coloring what needs to be colored
+    # change the color parameters
     if medians_only:
         for i, color_dict in zip(range(column_num), cycle(color_cycler)):
             mpl.artist.setp(bp['boxes'][i],color='000000')
@@ -352,3 +352,94 @@ def nu_raster(ax, df, color='00000', **x_vline):
     ax.invert_yaxis()
     simple_axis(ax)
     return ras
+
+def nu_violin(ax, df, cmap=False, color_list=False, no_x=False, outline_only=False, rug=False, **y_hline):
+    """
+    Makes a much improved boxplot.
+
+    Parameters
+    ----------
+    ax:
+        matplotlib axes object
+    df: pandas DataFrame
+        Pandas Dataframe where each column makes a separate boxplot. Column names will be used as x-axis labels.
+    cmap: string (or direct call)
+        Any valid matplotlib colormap (ex: 'afmhot' or 'viridis'). Can also call through direct mpl.cm.<colormap_name>.
+    color_list: list
+        List of valid matplotlib colors. Colors will be repeated if not enough are supplied.
+    no_x: bool (default=False)
+        Change to 'True' if you want to get rid of the bottom x-axis and ticks.
+    outline_only: bool (default=False)
+        Remove the fill from each of the violin plots.
+    rug: bool (default=False)
+        Add a short horizontal line where each datapoint would be. Try it. It's cool.
+    y_hline: key-value pair or None (default=None)
+        Draws an arbitrary number of dotted horizontal lines at user specified y-value that spans the entire length of the figure.
+        ex: string = <int or float>
+            baseline = -50.0
+
+    Returns
+    -------
+    vio: dict of matplolib objects
+        Contains all the necessary boxplot parameters, and when properly assigned to a matplotlib axes object will render your boxplot.
+
+    Notes
+    - 'medians_only' parameter does not currently work like it did in nu_boxplot. It will though, goddamnit!
+    -----
+    """
+    columns = df.columns
+    series_array = []
+    for column in columns:
+        series_array.append(df[column].dropna())
+    column_num = len(series_array)
+    # make the basic figure with better default properties.
+    vio = ax.violinplot(series_array,
+                        showmedians=True)
+    # make color cycler
+    if cmap:
+        color_idx = np.linspace(0,1,column_num)
+        color_cycler = cycler('color',[mpl.cm.get_cmap(cmap)(color_idx[i]) for i in range(column_num)])
+    elif color_list:
+        color_cycler = cycler('color',color_list)
+    else:
+        color_cycler = cycler('color',[i['color'] for i in mpl.rcParams['axes.prop_cycle']])
+    # change the color parameters
+    if outline_only:
+        for i, color_dict in zip(range(column_num), cycle(color_cycler)):
+            # need to set color at beginning so it doesn't cycle with every line
+            color = color_dict['color']
+            mpl.artist.setp(vio['bodies'][i],color='111111')
+            mpl.artist.setp(vio['bodies'][i],linewidth=2,edgecolor=color,alpha=1)
+            mpl.artist.setp(vio['cbars'],lw=0)
+            mpl.artist.setp(vio['cmaxes'],lw=0)
+            mpl.artist.setp(vio['cmedians'],lw=2,color='000000')
+            mpl.artist.setp(vio['cmins'],lw=0)
+    else:
+        for i, color_dict in zip(range(column_num), cycle(color_cycler)):
+            # need to set color at beginning so it doesn't cycle with every line
+            color = color_dict['color']
+            mpl.artist.setp(vio['bodies'][i],linewidth=2,color=color,alpha=0.35)
+            mpl.artist.setp(vio['cbars'],lw=0.5,color='000000')
+            mpl.artist.setp(vio['cmaxes'],lw=0)
+            mpl.artist.setp(vio['cmedians'],lw=3,color='000000')
+            mpl.artist.setp(vio['cmins'],lw=0)
+    # add rug plot if selected
+    if rug:
+        if df.ndim == 1:
+            ras = ax.hlines(df.T.values,0.95,1.05,color='000000',alpha=0.35,linewidth=0.5)
+        else:
+            data = df.T.values
+            for i, sweep in enumerate(data):
+                ras = ax.hlines(sweep,i+0.95,i+1.05,color='000000',alpha=0.35,linewidth=0.5)
+    # add in an optional line
+    for key, val in y_hline.items():
+        ax.axhline(y=val,color='grey',linestyle='dotted')
+    # make final changes to plot to clean it up and make it pretty
+    ax.set_xticks(np.arange(1,column_num+1))
+    ax.set_xlim(0.5,column_num+0.5)
+    ax.xaxis.set_ticklabels(columns, rotation=45, horizontalalignment='right')
+    simple_axis(ax)
+    if no_x:
+        ax.spines['bottom'].set_visible(False)
+        ax.get_xaxis().set_visible(False)
+    return vio
