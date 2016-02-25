@@ -151,22 +151,22 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
         Turns outliers on or off.
     y_hline: key-value pair or None (default=None)
         Draws an arbitrary number of dotted horizontal lines at user specified y-value that spans the entire length of the figure.
-        ex: string = <int or float>
-            baseline = -50.0
+        ex: string = <int or float> (baseline = -50.0)
 
     Returns
     -------
     bp: dict of matplolib objects
         Contains all the necessary boxplot parameters, and when properly assigned to a matplotlib axes object will render your boxplot.
 
-    Notes
-    -----
-    Built on top of Pandas instead of straight from matplotlib because of Panda's handles NaNs (unequal df column lengths) properly. It's just far easier to use what Wes has already built than reinvent the wheel when making multiple boxplots.
-
     TODO:
-    - Add y_label param??
     - move xaxis labels to left an option
     """
+    # remake data into list of lists. compensates for differing column sizes.
+    columns = df.columns
+    series_array = []
+    for column in columns:
+        series_array.append(df[column].dropna())
+    column_num = len(series_array)
     # set up basic plotting values and parameters
     if df.ndim == 1:
         column_num = 1
@@ -176,7 +176,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
         labels = df.columns.values
     # make the basic figure with better default properties.
     # first line are pd.df.boxplot specific params, then general mpl params
-    bp = df.boxplot(ax=ax,return_type='dict',rot=45,grid=False,
+    bp = ax.boxplot(series_array,
                     boxprops=dict(color='000000',linestyle='-',linewidth=2),
                     capprops=dict(color='000000',linestyle='-',linewidth=2),
                     flierprops=dict(linestyle='none',marker='.',markeredgecolor='000000',markerfacecolor='000000',markersize=5),
@@ -194,14 +194,13 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
     else:
         color_cycler = cycler('color',[i['color'] for i in mpl.rcParams['axes.prop_cycle']])
     # change the color parameters
-    if medians_only:
-        for i, color_dict in zip(range(column_num), cycle(color_cycler)):
+    for i, color_dict in zip(range(column_num), cycle(color_cycler)):
+        if medians_only:
             mpl.artist.setp(bp['boxes'][i],color='000000')
             mpl.artist.setp(bp['medians'][i],**color_dict)
             mpl.artist.setp(bp['whiskers'][i*2],color='000000')
             mpl.artist.setp(bp['whiskers'][i*2+1],color='000000')
-    else:
-        for i, color_dict in zip(range(column_num), cycle(color_cycler)):
+        else:
             # need to set color at beginning so it doesn't cycle with every line
             color = color_dict['color']
             mpl.artist.setp(bp['boxes'][i],color=color)
@@ -216,7 +215,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
     for key, val in y_hline.items():
         ax.axhline(y=val,color='grey',linestyle='dotted')
     # make final changes to plot to clean it up and make it pretty
-    ax.xaxis.set_ticklabels(labels, rotation=45, horizontalalignment='right')
+    ax.xaxis.set_ticklabels(columns, rotation=45, horizontalalignment='right')
     simple_axis(ax)
     if no_x:
         ax.spines['bottom'].set_visible(False)
@@ -246,7 +245,7 @@ def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05, ma
     monocolor: any matplotlib color (default=False)
         Set all scatter plot objects to the specificed color.
     no_x: bool (default=False)
-        Change to 'True' if you want to get rid of the bottom x-axis and ticks.     
+        Change to 'True' if you want to get rid of the bottom x-axis and ticks.
     paired: bool (default=False)
         Will draw grey lines to data points with the same row index. If jitter set to 0 lines will connect datapoints. If not, it will look stupid. (may add features later to keep people from mucking it up, but we'll see...)
     seed:
@@ -281,7 +280,7 @@ def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05, ma
     if paired:
         for i in range(len(df)):
             ax.plot(np.arange(1,column_num+1),df.ix[i],
-                    color='grey')
+                    color='000000',alpha=0.5)
     # create the scatter plot
     for i, color_dict in zip(range(column_num), cycle(color_cycler)):
         if column_num == 1:
@@ -392,6 +391,7 @@ def nu_violin(ax, df, cmap=False, color_list=False, no_x=False, outline_only=Fal
     - 'medians_only' parameter does not currently work like it did in nu_boxplot. It will though, goddamnit!
     -----
     """
+    # remake data into list of lists. compensates for differing column sizes.
     columns = df.columns
     series_array = []
     for column in columns:
@@ -409,8 +409,8 @@ def nu_violin(ax, df, cmap=False, color_list=False, no_x=False, outline_only=Fal
     else:
         color_cycler = cycler('color',[i['color'] for i in mpl.rcParams['axes.prop_cycle']])
     # change the color parameters
-    if outline_only:
-        for i, color_dict in zip(range(column_num), cycle(color_cycler)):
+    for i, color_dict in zip(range(column_num), cycle(color_cycler)):
+        if outline_only:
             # need to set color at beginning so it doesn't cycle with every line
             color = color_dict['color']
             mpl.artist.setp(vio['bodies'][i],color='111111')
@@ -419,8 +419,7 @@ def nu_violin(ax, df, cmap=False, color_list=False, no_x=False, outline_only=Fal
             mpl.artist.setp(vio['cmaxes'],lw=0)
             mpl.artist.setp(vio['cmedians'],lw=2,color='000000')
             mpl.artist.setp(vio['cmins'],lw=0)
-    else:
-        for i, color_dict in zip(range(column_num), cycle(color_cycler)):
+        else:
             # need to set color at beginning so it doesn't cycle with every line
             color = color_dict['color']
             mpl.artist.setp(vio['bodies'][i],linewidth=2,color=color,alpha=0.35)
