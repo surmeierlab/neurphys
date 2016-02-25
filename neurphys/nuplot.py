@@ -223,7 +223,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
         ax.get_xaxis().set_visible(False)
     return bp
 
-def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05, markersize=8, monocolor=False, paired=False, seed=0):
+def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05, markersize=8, monocolor=False, no_x=False, paired=False, seed=0):
     """
     Creates a scatter column plot.
 
@@ -245,6 +245,8 @@ def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05, ma
         Sets the size of the scatter plot marker.
     monocolor: any matplotlib color (default=False)
         Set all scatter plot objects to the specificed color.
+    no_x: bool (default=False)
+        Change to 'True' if you want to get rid of the bottom x-axis and ticks.     
     paired: bool (default=False)
         Will draw grey lines to data points with the same row index. If jitter set to 0 lines will connect datapoints. If not, it will look stupid. (may add features later to keep people from mucking it up, but we'll see...)
     seed:
@@ -307,6 +309,9 @@ def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05, ma
     ax.xaxis.set_ticks(np.arange(1, column_num+1))
     ax.xaxis.set_ticklabels(labels, rotation=45, horizontalalignment='right')
     simple_axis(ax)
+    if no_x:
+        ax.spines['bottom'].set_visible(False)
+        ax.get_xaxis().set_visible(False)
     return sc
 
 def nu_raster(ax, df, color='00000', **x_vline):
