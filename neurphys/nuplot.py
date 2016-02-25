@@ -417,7 +417,7 @@ def nu_violin(ax, df, cmap=False, color_list=False, no_x=False, outline_only=Fal
             mpl.artist.setp(vio['bodies'][i],linewidth=2,edgecolor=color,alpha=1)
             mpl.artist.setp(vio['cbars'],lw=0)
             mpl.artist.setp(vio['cmaxes'],lw=0)
-            mpl.artist.setp(vio['cmedians'],lw=2,color='000000')
+            mpl.artist.setp(vio['cmedians'],lw=3,color='000000')
             mpl.artist.setp(vio['cmins'],lw=0)
         else:
             # need to set color at beginning so it doesn't cycle with every line
