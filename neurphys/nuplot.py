@@ -11,6 +11,9 @@ from itertools import cycle
 # using my style not necessary, but GREATLY encouraged
 # mpl.style.use('estep_style')
 
+# like pandas-profiling
+# matplotlib.style.use(resource_filename(__name__, "estep_style.mplstyle"))
+
 def simple_axis(ax):
     """
     Removes the top and right axis lines and tick marks for a single matplotlib.axes object.
@@ -130,7 +133,7 @@ def nu_legend(f, x_scale, x_units, y_scale, y_units):
 
 def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=False, show_outliers=True, **y_hline):
     """
-    Makes a much improved boxplot.
+    Makes a much improved boxplot. Whiskers set at 10/90 percentiles.
 
     Parameters
     ----------
