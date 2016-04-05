@@ -491,12 +491,12 @@ outline_only=False, rug=False, **y_hline):
     if rug:
         if df.ndim == 1:
             ras = ax.hlines(df.T.values,0.95,1.05,color='000000',\
-            alpha=0.35,linewidth=0.5)
+            alpha=0.35,linewidth=0.75)
         else:
             data = df.T.values
             for i, sweep in enumerate(data):
                 ras = ax.hlines(sweep,i+0.95,i+1.05,color='000000',\
-                alpha=0.35,linewidth=0.5)
+                alpha=0.35,linewidth=0.75)
     # add in an optional line
     for key, val in y_hline.items():
         ax.axhline(y=val,color='grey',linestyle='dotted')
