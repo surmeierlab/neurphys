@@ -57,7 +57,8 @@ def keep_sweeps(df, sweep_list):
     df: Pandas DataFrame
         Dataframe created using one of the functions from Neurphys.
     sweep_list: 1D array_like of ints
-        List containing numbers of the sweeps you'd like dropped from the DataFrame.
+        List containing numbers of the sweeps you'd like dropped from the
+        DataFrame.
 
     Return
     ------
@@ -70,8 +71,10 @@ def keep_sweeps(df, sweep_list):
 
     TODO
     ----
-    As always, I need to build exceptions into this function and just need to make it generally more robust.
-    - make possibility for 'sweep_list' to be either pure numerical list, or actually contain list of sweep names (ex. ['sweep002','sweep016'])
+    As always, I need to build exceptions into this function and just need to
+    make it generally more robust.
+    - make possibility for 'sweep_list' to be either pure numerical list, or
+    actually contain list of sweep names (ex. ['sweep002','sweep016'])
     """
 
     keep_sweeps = [('sweep'+str(i).zfill(3)) for i in sweep_list]
@@ -87,7 +90,8 @@ def drop_sweeps(df, sweep_list):
     df: Pandas DataFrame
         Dataframe created using one of the functions from Neurphys.
     sweep_list: 1D array_like of ints
-        List containing numbers of the sweeps you'd like dropped from the DataFrame.
+        List containing numbers of the sweeps you'd like dropped from the
+        DataFrame.
 
     Return
     ------
@@ -100,8 +104,10 @@ def drop_sweeps(df, sweep_list):
 
     TODO
     ----
-    As always, I need to build exceptions into this function and just need to make it generally more robust.
-    - make possibility for 'sweep_list' to be either pure numerical list, or actually contain list of sweep names (ex. ['sweep002','sweep016'])
+    As always, I need to build exceptions into this function and just need to
+    make it generally more robust.
+    - make possibility for 'sweep_list' to be either pure numerical list, or
+    actually contain list of sweep names (ex. ['sweep002','sweep016'])
     """
 
     all_sweeps = df.index.levels[0].values
