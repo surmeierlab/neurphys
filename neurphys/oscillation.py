@@ -37,7 +37,7 @@ def create_epoch(df, window, step):
     change the source code.
 
     Based on your specified window and step size, your new DataFrame
-    may be truncated. 
+    may be truncated.
     """
 
     window = int(window)
@@ -51,11 +51,13 @@ def create_epoch(df, window, step):
     idx = np.arange(window)
     arrays = [sweep_names,epoch_names,idx]
     index = pd.MultiIndex.from_product(arrays,names=['sweep','epoch',None])
-    
+
     for sweep in sweeps:
         sweep_values = df.ix[sweep].values
-        epoch_data = np.array([sweep_values[(0 + step * i):(window + step * i)] for i in range(num_epochs)])
-        sweep_data = np.concatenate([epoch_data[i,:,:] for i in range(num_epochs)],axis=0) 
+        epoch_data = np.array([sweep_values[(0 + step * i):\
+        (window + step * i)] for i in range(num_epochs)])
+        sweep_data = np.concatenate([epoch_data[i,:,:] \
+        for i in range(num_epochs)],axis=0)
         sweep_list.append(sweep_data)
     concat_sweeps = np.concatenate(sweep_list,axis=0)
     epoch_df = pd.DataFrame(concat_sweeps,columns=df.columns.values)
@@ -91,7 +93,7 @@ def epoch_hist(epoch_df, channel, hist_min, hist_max, num_bins):
     -----
     'bins' column contains the 'leftmost' (smallest?) bin edge.
     """
-    
+
     hist_arrays = []
     bin_arrays = []
     sweep_names = epoch_df.index.levels[0].values
@@ -104,7 +106,8 @@ def epoch_hist(epoch_df, channel, hist_min, hist_max, num_bins):
     data = epoch_df[channel].values
 
     for i in range(total_epochs):
-        hist, bins = np.histogram(data[(i*epoch_size):((i+1)*epoch_size)],bins=num_bins,range=(hist_min,hist_max))
+        hist, bins = np.histogram(data[(i*epoch_size):\
+        ((i+1)*epoch_size)],bins=num_bins,range=(hist_min,hist_max))
         hist_arrays.append(hist)
         bin_arrays.append(bins[:num_bins])
     hist_concat = np.concatenate(hist_arrays,axis=0)
@@ -133,7 +136,7 @@ def epoch_kde(epoch_df, channel, range_min, range_max, resolution=None):
         Maximum of KDE range.
     resolution: int (default: None)
         Determines KDE resolution. >1000 gives very detailed KDEs, but
-        the default setting is a great tradeoff with speed. 
+        the default setting is a great tradeoff with speed.
 
     Returns
     -------
@@ -147,7 +150,7 @@ def epoch_kde(epoch_df, channel, range_min, range_max, resolution=None):
     ----------
     [1] https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.stats.gaussian_kde.html
     """
-    
+
     kde_arrays = []
     x_arrays = []
     if resolution == None:
@@ -196,13 +199,13 @@ def epoch_pgram(epoch_df, channel, fs=10e3):
     df: Dataframe
         Multiindexed Pandas DataFrame with the estimated power spectral
         density (V^2/Hz) and frequency as the new column names. All
-        indexing from the input DataFrame remain unchanged. 
+        indexing from the input DataFrame remain unchanged.
 
     References
     ----------
     [1] https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.signal.periodogram.html
     """
-    
+
     pgram_f_arrays = []
     pgram_den_arrays = []
     fs = int(fs)
@@ -216,7 +219,8 @@ def epoch_pgram(epoch_df, channel, fs=10e3):
     data = epoch_df[channel].values
 
     for i in range(total_epochs):
-        pgram_f, pgram_den = periodogram(data[(i*epoch_size):((i+1)*epoch_size)], fs)
+        pgram_f, pgram_den = periodogram(data[(i*epoch_size):\
+        ((i+1)*epoch_size)], fs)
         pgram_f_arrays.append(pgram_f)
         pgram_den_arrays.append(pgram_den)
     pgram_f_concat = np.concatenate(pgram_f_arrays,axis=0)
