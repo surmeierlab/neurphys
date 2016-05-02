@@ -19,22 +19,20 @@ most required libraries including `numpy`, `pandas`, `scipy`.
 Then download or clone the repository using `git` as follows,
 
 ```bash
-git clone https://github.com/surmeierlab/neurphys
+$ git clone https://github.com/surmeierlab/neurphys
 ```
 
 You can download dependencies which we provide in `requirements.txt`. Use `pip` to install
 the rest of dependencies i.e.
 
 ```bash
-pip install -r requirements.txt
+$ pip install -r requirements.txt
 ```
 
-For now, you have to add the package into python environment by adding path to `.bash_profile` or
-`.bashrc` in order to import and use `neurphys` library.
+Install `neurphys` using `setup.py` as follows
 
-```python
-export PYTHONPATH='/PATH/TO/neurphys:$PYTHONPATH'
-export PYTHONPATH
+```bash
+$ python setup.py develop install
 ```
 
 
