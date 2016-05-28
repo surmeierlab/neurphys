@@ -131,9 +131,9 @@ def nu_legend(f, x_scale, x_units, y_scale, y_units):
     y_range = abs(y_min-y_max)
     hline_min = (x_scale/x_range)
     vline_max = (y_scale/y_range)
-    ax.axhline(y=y_min,xmin=(1-hline_min),xmax=1,color='black',lw=2,label=\
+    ax.axhline(y=y_min,xmin=(1-hline_min),xmax=1,color='black',lw=0.5,label=\
     'x: {0} {1}'.format(x_scale,x_units))
-    ax.axvline(x=x_max,ymin=0,ymax=vline_max,color='black',lw=2,label=\
+    ax.axvline(x=x_max,ymin=0,ymax=vline_max,color='black',lw=0.5,label=\
     'y: {0} {1}'.format(y_scale,y_units))
     legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0, frameon=False)
 
@@ -192,8 +192,8 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
     # make the basic figure with better default properties.
     # first line are pd.df.boxplot specific params, then general mpl params
     bp = ax.boxplot(series_array,
-                    boxprops=dict(color='000000',linestyle='-',linewidth=2),
-                    capprops=dict(color='000000',linestyle='-',linewidth=2),
+                    boxprops=dict(color='000000',linestyle='-',linewidth=1),
+                    capprops=dict(color='000000',linestyle='-',linewidth=1),
                     flierprops=dict(linestyle='none',marker='.',\
                     markeredgecolor='000000',markerfacecolor='000000',\
                     markersize=5),
@@ -202,7 +202,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
                     showfliers=show_outliers,
                     widths=0.5,
                     whis=[10,90],
-                    whiskerprops=dict(color='000000',linestyle='-',linewidth=2
+                    whiskerprops=dict(color='000000',linestyle='-',linewidth=1
                     ))
     # make color cycler
     if cmap:
