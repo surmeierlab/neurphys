@@ -151,8 +151,14 @@ def import_folder(folder):
                                            (file_vals['voltage recording file']
                                             + '.csv'))
                 col_names = ['time'] + file_vals['channels']
-                primary_divisor = file_vals['primary']['divisor']
-                secondary_divisor = file_vals['secondary']['divisor']
+                if 'primary' in file_vals.keys():
+                    primary_divisor = file_vals['primary']['divisor']
+                else:
+                    primary_divisor = 1
+                if 'secondary' in file_vals.keys():
+                    secondary_divisor = file_vals['secondary']['divisor']
+                else:
+                    secondary_divisor = 1
 
                 df_vr = import_vr_csv(vr_filename, col_names, primary_divisor,
                                       secondary_divisor)
