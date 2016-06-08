@@ -381,7 +381,7 @@ def nu_raster(ax, df, color='00000', **x_vline):
     [1] https://scimusing.wordpress.com/2013/05/06/making-raster-plots-in-python-with-matplotlib/
 
     TODO:
-    - MAKE TIDY DATA COMPLIANT
+    - MAKE TIDY DATA COMPLIANT/work well with pacemaking module
     - y label?
     - bottom up option?
     - line weight?
