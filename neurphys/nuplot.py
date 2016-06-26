@@ -198,7 +198,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
                     markeredgecolor='000000',markerfacecolor='000000',\
                     markersize=5),
                     medianprops=dict(color='000000',linestyle='-',\
-                    linewidth=4),
+                    linewidth=3),
                     showfliers=show_outliers,
                     widths=0.5,
                     whis=[10,90],
