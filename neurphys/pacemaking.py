@@ -272,9 +272,10 @@ def _percent_shift(idx_array, percentages):
     return percent_idxs
 
 
-def masking_arrays(idx_array, shifts=False, percentages=False):
+def iei_arrays(idx_array, shifts=False, percentages=False):
     """
-    Create a labeled dicitonary of numpy arrays that
+    iei = inter-event interval
+    Short for inter-event interval arrays.
 
     Parameters
     ----------
