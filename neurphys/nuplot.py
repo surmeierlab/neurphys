@@ -195,7 +195,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
                     boxprops=dict(color='000000',linestyle='-',linewidth=1),
                     capprops=dict(color='000000',linestyle='-',linewidth=1),
                     flierprops=dict(linestyle='none',marker='.',\
-                    markeredgecolor='000000',markerfacecolor='000000',\
+                    markeredgecolor='none',markerfacecolor='000000',\
                     markersize=5),
                     medianprops=dict(color='000000',linestyle='-',\
                     linewidth=3),
@@ -233,7 +233,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
             mpl.artist.setp(bp['whiskers'][i*2+1],color=color)
             if show_outliers:
                 mpl.artist.setp(bp['fliers'][i],markerfacecolor=color,\
-                markeredgecolor=color)
+                markeredgecolor='none')
     # add in an optional line
     for key, val in y_hline.items():
         ax.axhline(y=val,color='grey',linestyle='dotted')
@@ -344,7 +344,7 @@ markersize=8, monocolor=False, no_x=False, paired=False, seed=0):
                      markeredgewidth=0)
         if monocolor:
             mpl.artist.setp(sc[0],\
-            markeredgecolor=monocolor,markerfacecolor=monocolor)
+            markeredgecolor='none',markerfacecolor=monocolor)
     # make final changes to plot to clean it up and make it pretty
     ax.set_xlim(0.5, column_num+0.5)
     ax.xaxis.set_ticks(np.arange(1, column_num+1))
@@ -403,8 +403,7 @@ def nu_raster(ax, df, color='00000', **x_vline):
     simple_axis(ax)
     return ras
 
-def nu_violin(ax, df, cmap=False, color_list=False, no_x=False,\
-outline_only=False, rug=False, **y_hline):
+def nu_violin(ax, df, cmap=False, color_list=False, no_x=False,outline_only=False, rug=False, **y_hline):
     """
     Makes a much improved boxplot.
 
