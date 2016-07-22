@@ -236,7 +236,7 @@ def _fixed_shift(idx_array, shifts, false_array=False):
         return fixed_true_idxs
 
 
-def _percent_shift(idx_array, percentages):
+def _percent_shift(idx_array, percentiles):
     """
     Shift an array by percentage of the difference between successive array elements.
         Note: considering this is made specifically for building masking arrays for pandas
@@ -247,7 +247,7 @@ def _percent_shift(idx_array, percentages):
     ----------
     idx_array: array (ideally numpy array)
         Describe it.
-    percentages: array of fractions
+    percentiles: array of fractions
         Describe it.
 
     Return
@@ -259,20 +259,20 @@ def _percent_shift(idx_array, percentages):
     ----------
 
     TODO:
-    check 'percentages' so that they're what they should be
+    check 'percentiles' so that they're what they should be
 
     """
 
     shift = np.roll(idx_array,1)
     diff_array = idx_array - shift
 
-    percent_arrays = [(diff_array*percent).astype(int) for percent in percentages]
+    percent_arrays = [(diff_array*percent).astype(int) for percent in percentiles]
     percent_idxs   = [idx_array[:-1]+percent_arrays[i][1:] for i,_ in enumerate(percent_arrays)]
 
     return percent_idxs
 
 
-def iei_arrays(idx_array, shifts=False, percentages=False):
+def iei_arrays(idx_array, shifts=False, percentiles=False):
     """
     iei = inter-event interval
     Short for inter-event interval arrays.
@@ -281,7 +281,7 @@ def iei_arrays(idx_array, shifts=False, percentages=False):
     ----------
     idx_array: array (ideally numpy array)
         Describe it.
-    percentages: array of fractions
+    percentiles: array of fractions
         Describe it.
 
     Return
@@ -304,8 +304,8 @@ def iei_arrays(idx_array, shifts=False, percentages=False):
 
     percent_idxs = []
     try:
-        percent_idxs = _percent_shift(idx_array, percentages)
-        percent_dict = {'percen_{0}'.format(val): percent_idxs[i] for i,val in enumerate(percentages)}
+        percent_idxs = _percent_shift(idx_array, percentiles)
+        percent_dict = {'percen_{0}'.format(val): percent_idxs[i] for i,val in enumerate(percentiles)}
     except:
         pass
 
