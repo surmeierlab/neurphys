@@ -305,7 +305,7 @@ def iei_arrays(idx_array, shifts=False, percentiles=False):
     percent_idxs = []
     try:
         percent_idxs = _percent_shift(idx_array, percentiles)
-        percent_dict = {'percen_{0}'.format(val): percent_idxs[i] for i,val in enumerate(percentiles)}
+        percent_dict = {'percen_{0:.2f}'.format(val): percent_idxs[i] for i,val in enumerate(percentiles)}
     except:
         pass
 
