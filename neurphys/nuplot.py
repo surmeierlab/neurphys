@@ -175,6 +175,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
 
     TODO:
     - move xaxis labels to left an option
+    - CHANGE OUTLIERS TO SOMETHING MORE COMPATIBLE WITH ILLUSTRATOR. MAYBE DECREASE SIZE WHILE INCREASING LINEWIDTH TO MAKE ILLUSION OF FILLED CIRCLE, BUT WON'T RUN INTO PROBLEM WHEN CHANGING COLOR IN THE PROGRAM?
     """
     # remake data into list of lists. compensates for differing column sizes.
     columns = df.columns
