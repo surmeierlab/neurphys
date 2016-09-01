@@ -284,7 +284,6 @@ def iei_arrays(idx_array, shifts=False, percentiles=False):
     dataframes.
 
     iei = inter-event interval
-    Short for inter-event interval arrays.
 
     Parameters
     ----------
@@ -309,6 +308,7 @@ def iei_arrays(idx_array, shifts=False, percentiles=False):
     ----------
 
     TODO:
+    - assign fixed_dict to an collections.OrderedDict()? this is probably a good idea
     """
 
     fixed_true_idxs = []
