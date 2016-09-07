@@ -17,13 +17,13 @@ def _get_ephys_vals(element):
         unit = element.find('.//UnitName').text
         divisor = float(element.find('.//Divisor').text)
 
-        return 'primary', {'unit': unit, 'divisor': divisor}
+        return {'unit': unit, 'divisor': divisor}
 
     elif ch_type == '1':
         unit = element.find('.//UnitName').text
         divisor = float(element.find('.//Divisor').text)
 
-        return 'secondary', {'unit': unit, 'divisor': divisor}
+        return {'unit': unit, 'divisor': divisor}
 
 
 def parse_xml(filename):
@@ -39,13 +39,11 @@ def parse_xml(filename):
         parent = ch.getparent()
         if parent.find('.//Type').text == 'Physical':
             clamp_device = parent.find('.//PatchclampDevice').text
-
+            name = parent.find('.//Name').text
+            
             if clamp_device is not None:
-                name, ephys_vals = _get_ephys_vals(parent)
+                ephys_vals = _get_ephys_vals(parent)
                 file_attr[name] = ephys_vals
-
-            else:
-                name = parent.find('.//Name').text
 
             ch_names.append(name.lower())
 
