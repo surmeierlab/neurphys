@@ -28,6 +28,7 @@ def simple_axis(ax):
     ax.get_xaxis().tick_bottom()
     ax.get_yaxis().tick_left()
 
+
 def simple_figure(f):
     """
     Removes the top and right axis lines and tick marks for all axes in a matplolib figure.
@@ -46,6 +47,7 @@ def simple_figure(f):
             f.axes[i].spines['right'].set_visible(False)
             f.axes[i].get_xaxis().tick_bottom()
             f.axes[i].get_yaxis().tick_left()
+
 
 def clean_axis(ax, y_units, **y_hline):
     """
@@ -71,6 +73,7 @@ def clean_axis(ax, y_units, **y_hline):
     ax.get_yaxis().set_visible(False)
     for key, val in y_hline.items():
         ax.axhline(y=val,color='grey',linestyle='dotted',label='{0}: {1} {2}'.format(key,val,y_units))
+
 
 def clean_figure(f, y_units, **y_hline):
     """
@@ -102,6 +105,7 @@ def clean_figure(f, y_units, **y_hline):
             for key, val in y_hline.items():
                 f.axes[i].axhline(y=val,color='grey',linestyle='dotted',\
                 label='{0}: {1} {2}'.format(key,val,y_units))
+
 
 def nu_legend(f, x_scale, x_units, y_scale, y_units):
     """
@@ -136,6 +140,7 @@ def nu_legend(f, x_scale, x_units, y_scale, y_units):
     ax.axvline(x=x_max,ymin=0,ymax=vline_max,color='black',lw=0.5,label=\
     'y: {0} {1}'.format(y_scale,y_units))
     legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0, frameon=False)
+
 
 def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=False, show_outliers=True, **y_hline):
     """
@@ -247,6 +252,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
         ax.get_xaxis().set_visible(False)
     return bp
 
+
 def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05,\
 markersize=8, monocolor=False, no_x=False, paired=False, seed=0):
     """
@@ -357,6 +363,7 @@ markersize=8, monocolor=False, no_x=False, paired=False, seed=0):
         ax.get_xaxis().set_visible(False)
     return sc
 
+
 def nu_raster(ax, df, color='00000', **x_vline):
     """
     Creates a raster plot that reads top-down and left-right.
@@ -404,6 +411,7 @@ def nu_raster(ax, df, color='00000', **x_vline):
     ax.invert_yaxis()
     simple_axis(ax)
     return ras
+
 
 def nu_violin(ax, df, cmap=False, color_list=False, no_x=False,outline_only=False, rug=False, **y_hline):
     """
