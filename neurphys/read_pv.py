@@ -153,8 +153,8 @@ def import_folder(folder):
                                            (file_vals['voltage recording file']
                                             + '.csv'))
                 
-                col_names = file_vals['channels']
-                df_vr = import_vr_csv(vr_filename, col_names,
+                df_vr = import_vr_csv(vr_filename,
+                                      file_vals['channels'],
                                       file_vals['divisors'])
 
                 data_vr.append(df_vr)
