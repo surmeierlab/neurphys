@@ -140,7 +140,7 @@ def baseline_pacemaking(df, n=200):
     return df
 
 
-def calc_freq(df, mph, valley=False, hz=True,
+def calc_freq(df, mph, mpd, valley=False, hz=True,
               ret_indices=False, ret_times=False):
     """Calculate instantaneous frequency of events exceeding a specific height
 
@@ -168,12 +168,13 @@ def calc_freq(df, mph, valley=False, hz=True,
     frequency array. indices and times are returned ordered in that
     order in list if both are desired (i.e. ret_vals[1] and ret_vals[2])
     """
+
     ret_vals = []
     if valley:
         indices = detect_peaks(df['primary'].values, mph=abs(mph),
-                               valley=valley, mpd=100)
+                               valley=valley, mpd=mpd)
     else:
-        indices = detect_peaks(df['primary'].values, mph=mph, mpd=100)
+        indices = detect_peaks(df['primary'].values, mph=mph, mpd=mpd)
     times = df['time'].ix[indices].values
     times_dif = times[1:] - times[:-1]
 
