@@ -40,14 +40,14 @@ def create_epoch(df, window, step):
     may be truncated.
     """
 
-    window = int(window)
-    step = int(step)
-    num_rows = len(df.ix[df.index.levels[0][0]])
+    window, step = int(window), int(step)
+    # only need lenght of indiv sweeps
+    num_rows = df.index.levshape[1]
     num_epochs = int(1 + (num_rows - window) / step)
     sweep_list = []
     sweeps = df.index.levels[0].values
-    sweep_names = ['sweep' + str(i + 1).zfill(3) for i in range(len(sweeps))]
-    epoch_names = ['epoch' + str(i + 1).zfill(3) for i in range(num_epochs)]
+    sweep_names = ['sweep{}'.format(str(i+1).zfill(3)) for i in range(len(sweeps))]
+    epoch_names = ['epoch{}'.format(str(i+1).zfill(3)) for i in range(num_epochs)]
     idx = np.arange(window)
     arrays = [sweep_names,epoch_names,idx]
     index = pd.MultiIndex.from_product(arrays,names=['sweep','epoch',None])
