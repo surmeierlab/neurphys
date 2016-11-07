@@ -1,7 +1,6 @@
-#!/usr/bin/env python
-__author__ = "Chad Estep (chadestep@gmail.com)"
-
-""" Plotting helper functions for publication quality figures """
+"""
+Plotting helper functions for publication quality figures.
+"""
 
 import matplotlib as mpl
 from matplotlib.pyplot import legend
@@ -11,12 +10,14 @@ from itertools import cycle
 # using my style not necessary, but GREATLY encouraged
 # mpl.style.use('estep_style')
 
-# like pandas-profiling
+# like pandas-profiling - also check the way Seaborn does it
 # matplotlib.style.use(resource_filename(__name__, "estep_style.mplstyle"))
+
 
 def simple_axis(ax):
     """
-    Removes the top and right axis lines and tick marks for a single matplotlib.axes object.
+    Removes the top and right axis lines and tick marks for a single
+    matplotlib.axes object.
 
     Parameters
     ----------
@@ -72,7 +73,9 @@ def clean_axis(ax, y_units, **y_hline):
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
     for key, val in y_hline.items():
-        ax.axhline(y=val,color='grey',linestyle='dotted',label='{0}: {1} {2}'.format(key,val,y_units))
+        ax.axhline(y=val,color='grey',linestyle='dotted',
+                   label='{0}: {1} {2}'.format(key,val,y_units))
+
 
 
 def clean_figure(f, y_units, **y_hline):
@@ -103,8 +106,10 @@ def clean_figure(f, y_units, **y_hline):
             f.axes[i].get_xaxis().set_visible(False)
             f.axes[i].get_yaxis().set_visible(False)
             for key, val in y_hline.items():
-                f.axes[i].axhline(y=val,color='grey',linestyle='dotted',\
-                label='{0}: {1} {2}'.format(key,val,y_units))
+                f.axes[i].axhline(y=val,color='grey',
+                                  linestyle='dotted',label=
+                                  '{0}: {1} {2}'.format(key,val,y_units))
+
 
 
 def nu_legend(f, x_scale, x_units, y_scale, y_units):
@@ -128,6 +133,7 @@ def nu_legend(f, x_scale, x_units, y_scale, y_units):
     TODO:
     - modify this function to work on specific axes?
     """
+
     ax = f.axes[-1]
     x_min,x_max = ax.get_xlim()[0],ax.get_xlim()[1]
     y_min,y_max = ax.get_ylim()[0],ax.get_ylim()[1]
@@ -135,6 +141,17 @@ def nu_legend(f, x_scale, x_units, y_scale, y_units):
     y_range = abs(y_min-y_max)
     hline_min = (x_scale/x_range)
     vline_max = (y_scale/y_range)
+<<<<<<< HEAD
+    ax.axhline(y=y_min,xmin=(1-hline_min),xmax=1,color='black',lw=2,
+               label='x: {0} {1}'.format(x_scale,x_units))
+    ax.axvline(x=x_max,ymin=0,ymax=vline_max,color='black',lw=2,
+               label='y: {0} {1}'.format(y_scale,y_units))
+    legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0, frameon=False)
+
+
+def nu_boxplot(ax, df, cmap=False, color_list=False,
+               medians_only=False, no_x=False, show_outliers=True, **y_hline):
+=======
     ax.axhline(y=y_min,xmin=(1-hline_min),xmax=1,color='black',lw=0.5,label=\
     'x: {0} {1}'.format(x_scale,x_units))
     ax.axvline(x=x_max,ymin=0,ymax=vline_max,color='black',lw=0.5,label=\
@@ -143,6 +160,7 @@ def nu_legend(f, x_scale, x_units, y_scale, y_units):
 
 
 def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=False, show_outliers=True, **y_hline):
+>>>>>>> master
     """
     Makes a much improved boxplot. Whiskers set at 10/90 percentiles.
 
@@ -199,6 +217,15 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
     # make the basic figure with better default properties.
     # first line are pd.df.boxplot specific params, then general mpl params
     bp = ax.boxplot(series_array,
+<<<<<<< HEAD
+                    boxprops=dict(color='000000',linestyle='-',linewidth=2),
+                    capprops=dict(color='000000',linestyle='-',linewidth=2),
+                    flierprops=dict(linestyle='none',marker='.',
+                                    markeredgecolor='000000',
+                                    markerfacecolor='000000',markersize=5),
+                    medianprops=dict(color='000000',linestyle='-',
+                                     linewidth=4),
+=======
                     boxprops=dict(color='000000',linestyle='-',linewidth=1),
                     capprops=dict(color='000000',linestyle='-',linewidth=1),
                     flierprops=dict(linestyle='none',marker='.',\
@@ -206,6 +233,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
                     markersize=5),
                     medianprops=dict(color='000000',linestyle='-',\
                     linewidth=3),
+>>>>>>> master
                     showfliers=show_outliers,
                     widths=0.5,
                     whis=[10,90],
@@ -214,13 +242,13 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
     # make color cycler
     if cmap:
         color_idx = np.linspace(0,1,column_num)
-        color_cycler = cycler('color',[mpl.cm.get_cmap(cmap)(color_idx[i]) \
-        for i in range(column_num)])
+        color_cycler = cycler('color',[mpl.cm.get_cmap(cmap)(color_idx[i])
+                              for i in range(column_num)])
     elif color_list:
         color_cycler = cycler('color',color_list)
     else:
-        color_cycler = cycler('color',[i['color'] \
-        for i in mpl.rcParams['axes.prop_cycle']])
+        color_cycler = cycler('color',[i['color']
+                              for i in mpl.rcParams['axes.prop_cycle']])
     # change the color parameters
     for i, color_dict in zip(range(column_num), cycle(color_cycler)):
         if medians_only:
@@ -239,8 +267,13 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
             mpl.artist.setp(bp['whiskers'][i*2],color=color)
             mpl.artist.setp(bp['whiskers'][i*2+1],color=color)
             if show_outliers:
+<<<<<<< HEAD
+                mpl.artist.setp(bp['fliers'][i],markerfacecolor=color,
+                                markeredgecolor=color)
+=======
                 mpl.artist.setp(bp['fliers'][i],markerfacecolor=color,\
                 markeredgecolor='none')
+>>>>>>> master
     # add in an optional line
     for key, val in y_hline.items():
         ax.axhline(y=val,color='grey',linestyle='dotted')
@@ -253,8 +286,14 @@ def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=Fa
     return bp
 
 
+<<<<<<< HEAD
+def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05,
+               markersize=8, monocolor=False, no_x=False, paired=False,
+               seed=0):
+=======
 def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05,\
 markersize=8, monocolor=False, no_x=False, paired=False, seed=0):
+>>>>>>> master
     """
     Creates a scatter column plot.
 
@@ -306,6 +345,7 @@ markersize=8, monocolor=False, no_x=False, paired=False, seed=0):
     Need input from the lab since I don't want an overabundance of optional
     parameters to pass to the function that won't be used 99.9% of the time).
     """
+
     # set up basic plotting values and parameters
     np.random.seed(seed)
     data = df.values
@@ -318,13 +358,13 @@ markersize=8, monocolor=False, no_x=False, paired=False, seed=0):
     # make color cycler
     if cmap:
         color_idx = np.linspace(0,1,column_num)
-        color_cycler = cycler('color',[mpl.cm.get_cmap(cmap)(color_idx[i]) \
-        for i in range(column_num)])
+        color_cycler = cycler('color',[mpl.cm.get_cmap(cmap)(color_idx[i])
+                              for i in range(column_num)])
     elif color_list:
         color_cycler = cycler('color',color_list)
     else:
-        color_cycler = cycler('color',[i['color'] \
-        for i in mpl.rcParams['axes.prop_cycle']])
+        color_cycler = cycler('color',[i['color']
+                              for i in mpl.rcParams['axes.prop_cycle']])
     # need to draw paired lines first for stacking purposes
     if paired:
         for i in range(len(df)):
@@ -387,7 +427,8 @@ def nu_raster(ax, df, color='00000', **x_vline):
         assigned to a matplotlib axes object will render your raster plot.
 
     Heavily adapted from:
-    [1] https://scimusing.wordpress.com/2013/05/06/making-raster-plots-in-python-with-matplotlib/
+    [1] https://scimusing.wordpress.com/2013/05/06/
+    making-raster-plots-in-python-with-matplotlib/
 
     TODO:
     - MAKE TIDY DATA COMPLIANT/work well with pacemaking module
@@ -396,6 +437,7 @@ def nu_raster(ax, df, color='00000', **x_vline):
     - line weight?
     - dotted line color/weight?
     """
+
     if df.ndim == 1:
         ras = ax.vlines(df.T.values,0.5,1.5,color=color)
     else:
@@ -413,7 +455,12 @@ def nu_raster(ax, df, color='00000', **x_vline):
     return ras
 
 
+<<<<<<< HEAD
+def nu_violin(ax, df, cmap=False, color_list=False, no_x=False,
+              outline_only=False, rug=False, **y_hline):
+=======
 def nu_violin(ax, df, cmap=False, color_list=False, no_x=False,outline_only=False, rug=False, **y_hline):
+>>>>>>> master
     """
     Makes a much improved boxplot.
 
@@ -455,6 +502,7 @@ def nu_violin(ax, df, cmap=False, color_list=False, no_x=False,outline_only=Fals
     nu_boxplot. It will though, goddamnit!
     -----
     """
+
     # remake data into list of lists. compensates for differing column sizes.
     columns = df.columns
     series_array = []

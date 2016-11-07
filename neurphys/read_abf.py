@@ -1,8 +1,10 @@
-#!/usr/bin/env python
-__author__ = "Dan Galtieri and Chad Estep (chadestep@gmail.com)"
+"""
+Functions to import and manipulate Axon Binary Files.
+"""
 
 from neo import io
 import pandas as pd
+
 
 def read_abf(filepath):
     """
@@ -48,6 +50,7 @@ def read_abf(filepath):
     df = pd.concat(df_list, keys=sweep_list, names=['sweep'])
     return df
 
+
 def keep_sweeps(df, sweep_list):
     """
     Keeps specified sweeps from your DataFrame.
@@ -80,6 +83,7 @@ def keep_sweeps(df, sweep_list):
     keep_sweeps = [('sweep'+str(i).zfill(3)) for i in sweep_list]
     keep_df = df.loc[pd.IndexSlice[keep_sweeps]]
     return keep_df
+
 
 def drop_sweeps(df, sweep_list):
     """
