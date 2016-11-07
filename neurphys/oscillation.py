@@ -1,23 +1,72 @@
-#!/usr/bin/env python
-__author__ = "Chad Estep (chadestep@gmail.com)"
-
-""" Functions for analyzing oscillatory activity """
+"""
+Functions for analyzing oscillatory activity.
+"""
 
 import numpy as np
-import scipy as sp
 from scipy.signal import periodogram
 from scipy.stats import gaussian_kde
 import pandas as pd
 
-def create_epoch(df, window, step):
+
+def _create_epoch(df, window, step):
     """
-    Takes a Pandas DataFrame and blocks it into epochs based on your
-    input parameters.
+    Creates a generator that blocks a Pandas DataFrame based on your
+    input parameters
 
     Parameters
     ----------
     df: DataFrame
-        Pandas Dataframe from 'read_abf' function.
+        Pandas Dataframe from 'read_abf/pv' function.
+    window: int
+        Epoch size based on array index.
+    step: int
+        Start-to-start number of rows between captured windows (may
+        overlap with other windows).
+
+    Yields
+    -------
+    epoch_df: DataFrame
+        Multiindexed Pandas DataFrame with column names unchanged and
+        an added index level named 'epoch.'
+
+    Notes
+    -----
+    To keep the funtion as simple as possible, the number of epochs
+    has been limited to 999, but if you really need more then feel
+    free to change the source code.
+
+    Based on your specified window and step size, your new DataFrame
+    may be truncated.
+    """
+
+    window, step = int(window), int(step)
+    # if multiple sweeps, assuming all sweeps are exactly the same length
+    num_rows = df.index.levshape[1]
+    num_epochs = int(1 + (num_rows - window) / step)
+    if num_epochs > 1000:
+        raise ValueError(
+            'Too many epochs. Change parameters to create <1000 epochs')
+    sweeps = df.index.levels[0].values
+
+    for sweep in sweeps:
+        # first index out a single sweep to prevent runover
+        sweep_df = df.ix[sweep]
+        for epoch in range(num_epochs):  # faster than a while loop
+            # have to add 0 to beginning so the first multiplication
+            # has a real number result
+            data = sweep_df[(0 + step * epoch):(window + step * epoch)]
+            yield data
+
+
+def _epoch_data(df, window, step):
+    """
+    Returns a few useful parameters about epoch dataframes to use for
+    downstream functions.
+
+    Parameters
+    ----------
+    df: DataFrame
+        Pandas Dataframe from 'read_abf/pv' function.
     window: int
         Epoch size based on array index.
     step: int
@@ -26,54 +75,34 @@ def create_epoch(df, window, step):
 
     Returns
     -------
-    epoch_df: DataFrame
-        Multiindexed Pandas DataFrame with column names unchanged and
-        an added index level named 'epoch.'
+    sweep_names: list
+        List of sweep names from the input DataFrame.
+    epoch_names:
+        List of epoch names made by the _create_epoch function.
 
-    Notes
-    -----
-    To keep the funtion as simple as possible, the number of epochs has
-    been limited to 999, but if you really need more then feel free to
-    change the source code.
-
-    Based on your specified window and step size, your new DataFrame
-    may be truncated.
     """
 
-    window, step = int(window), int(step)
-    # only need lenght of indiv sweeps
     num_rows = df.index.levshape[1]
     num_epochs = int(1 + (num_rows - window) / step)
-    sweep_list = []
-    sweeps = df.index.levels[0].values
-    sweep_names = ['sweep{}'.format(str(i+1).zfill(3)) for i in range(len(sweeps))]
-    epoch_names = ['epoch{}'.format(str(i+1).zfill(3)) for i in range(num_epochs)]
-    idx = np.arange(window)
-    arrays = [sweep_names,epoch_names,idx]
-    index = pd.MultiIndex.from_product(arrays,names=['sweep','epoch',None])
-
-    for sweep in sweeps:
-        sweep_values = df.ix[sweep].values
-        epoch_data = np.array([sweep_values[(0 + step * i):\
-        (window + step * i)] for i in range(num_epochs)])
-        sweep_data = np.concatenate([epoch_data[i,:,:] \
-        for i in range(num_epochs)],axis=0)
-        sweep_list.append(sweep_data)
-    concat_sweeps = np.concatenate(sweep_list,axis=0)
-    epoch_df = pd.DataFrame(concat_sweeps,columns=df.columns.values)
-    epoch_df.set_index(index,inplace=True)
-    return epoch_df
+    sweep_names = df.index.levels[0].values
+    epoch_names = ['epoch{}'.format(str(i+1).zfill(3))
+                   for i in range(num_epochs)]
+    return sweep_names, epoch_names
 
 
-def epoch_hist(epoch_df, channel, hist_min, hist_max, num_bins):
+def epoch_hist(df, window, step, channel, hist_min, hist_max, num_bins):
     """
-    Returns a 1D histogram for each of the epochs created from
-    'create_epoch' function.
+    Create a 1D histogram for each epoch based on input parameters.
 
     Parameters
     ----------
-    epoch_df: DataFrame
-        Dataframe from 'create_epoch' function.
+    df: DataFrame
+        Pandas Dataframe from 'read_abf/pv' function.
+    window: int
+        Epoch size based on array index.
+    step: int
+        Start-to-start number of rows between captured windows (may
+        overlap with other windows).
     channel: str
         Channel column to be analyzed.
     hist_min: int/float
@@ -91,34 +120,44 @@ def epoch_hist(epoch_df, channel, hist_min, hist_max, num_bins):
 
     Notes
     -----
-    'bins' column contains the 'leftmost' (smallest?) bin edge.
+    'bins' column contains the 'leftmost' bin edge. Also note, that
+    bins are truncated from original numpy function of (len(hist + 1)).
+    Check numpy docs if confused.
     """
 
+    # set up basic containers and inputs
     hist_arrays = []
     bin_arrays = []
-    sweep_names = epoch_df.index.levels[0].values
-    epoch_names = epoch_df.index.levels[1].values
-    idx = np.arange(num_bins)
-    arrays = [sweep_names,epoch_names,idx]
-    index = pd.MultiIndex.from_product(arrays,names=['sweep','epoch',None])
-    total_epochs = len(sweep_names)*len(epoch_names)
-    epoch_size = epoch_df.ix['sweep001'][channel].xs('epoch001').size
-    data = epoch_df[channel].values
+    epochs = _create_epoch(df, window, step)
+    sweep_names, epoch_names = _epoch_data(df, window, step)
 
-    for i in range(total_epochs):
-        hist, bins = np.histogram(data[(i*epoch_size):\
-        ((i+1)*epoch_size)],bins=num_bins,range=(hist_min,hist_max))
+    # set up indicies for returned df (just easier to remake them here)
+    idx = np.arange(num_bins)
+    arrays = [sweep_names, epoch_names, idx]
+    index = pd.MultiIndex.from_product(arrays, names=['sweep', 'epoch', None])
+
+    for epoch in epochs:
+        hist, bins = np.histogram(epoch[channel],
+                                  bins=num_bins, range=(hist_min, hist_max))
         hist_arrays.append(hist)
-        bin_arrays.append(bins[:num_bins])
-    hist_concat = np.concatenate(hist_arrays,axis=0)
-    bin_concat = np.concatenate(bin_arrays,axis=0)
-    data = list(zip(bin_concat,hist_concat))
-    df = pd.DataFrame(data,columns=['bin',channel])
+        bin_arrays.append(bins[:-1])
+
+    # stitch the arrays together
+    hist_concat = np.concatenate(hist_arrays, axis=0)
+    bin_concat = np.concatenate(bin_arrays, axis=0)
+    data = list(zip(bin_concat, hist_concat))
+
+    # turn them into a dataframe with the correct column labels
+    df = pd.DataFrame(data, columns=['bin', channel])
+
+    # add the correct multiindex labeling
     df.set_index(index, inplace=True)
+
     return df
 
 
-def epoch_kde(epoch_df, channel, range_min, range_max, resolution=None):
+def epoch_kde(df, window, step, channel, range_min, range_max,
+              resolution=None):
     """
     Returns a 1D kernel density estimation with automatic bandwidth
     detection for each of the epochs created from the 'create_epoch'
@@ -126,8 +165,13 @@ def epoch_kde(epoch_df, channel, range_min, range_max, resolution=None):
 
     Parameters
     ----------
-    epoch_df: Dataframe
-        Dataframe from 'create_epoch' function.
+    df: DataFrame
+        Pandas Dataframe from 'read_abf/pv' function.
+    window: int
+        Epoch size based on array index.
+    step: int
+        Start-to-start number of rows between captured windows (may
+        overlap with other windows).
     channel: str
         Channel column to be analyzed.
     range_min: int/float
@@ -148,47 +192,60 @@ def epoch_kde(epoch_df, channel, range_min, range_max, resolution=None):
 
     References
     ----------
-    [1] https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.stats.gaussian_kde.html
+    [1] https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/
+    scipy.stats.gaussian_kde.html
     """
 
+    # set up basic containers and inputs
     kde_arrays = []
     x_arrays = []
-    if resolution == None:
+    if resolution is None:
         resolution = abs(range_min - range_max) * 5
     else:
         resolution = resolution
-    sweep_names = epoch_df.index.levels[0].values
-    epoch_names = epoch_df.index.levels[1].values
-    idx = np.arange(resolution)
-    arrays = [sweep_names,epoch_names,idx]
-    index = pd.MultiIndex.from_product(arrays,names=['sweep','epoch',None])
-    total_epochs = len(sweep_names)*len(epoch_names)
-    epoch_size = epoch_df.ix['sweep001'][channel].xs('epoch001').size
-    x = np.linspace(range_min, range_max, resolution)
-    data = epoch_df[channel].values
 
-    for i in range(total_epochs):
-        kde = gaussian_kde(data[(i*epoch_size):((i+1)*epoch_size)])
+    epochs = _create_epoch(df, window, step)
+    sweep_names, epoch_names = _epoch_data(df, window, step)
+
+    # set up indicies for returned df (just easier to remake them here)
+    x = np.linspace(range_min, range_max, resolution)
+    idx = np.arange(resolution)
+    arrays = [sweep_names, epoch_names, idx]
+    index = pd.MultiIndex.from_product(arrays, names=['sweep', 'epoch', None])
+
+    for epoch in epochs:
+        kde = gaussian_kde(epoch[channel])
         kde_data = kde(x)
         kde_arrays.append(kde_data)
         x_arrays.append(x)
-    kde_concat = np.concatenate(kde_arrays,axis=0)
-    x_concat = np.concatenate(x_arrays,axis=0)
-    data = list(zip(x_concat,kde_concat))
-    df = pd.DataFrame(data,columns=['x',channel])
+
+    # stitch the arrays together
+    kde_concat = np.concatenate(kde_arrays, axis=0)
+    x_concat = np.concatenate(x_arrays, axis=0)
+    data = list(zip(x_concat, kde_concat))
+
+    # turn them into a dataframe with the correct column labels
+    df = pd.DataFrame(data, columns=['x', channel])
+
+    # add the correct multiindex labeling
     df.set_index(index, inplace=True)
     return df
 
 
-def epoch_pgram(epoch_df, channel, fs=10e3):
+def epoch_pgram(df, window, step, channel, fs=10e3):
     """
     Returns a periodogram for each of the epochs created from the
     'create_epoch' function.
 
     Parameters
     ----------
-    epoch_df: Dataframe
-        Dataframe from 'create_epoch' function.
+    df: DataFrame
+        Pandas Dataframe from 'read_abf/pv' function.
+    window: int
+        Epoch size based on array index.
+    step: int
+        Start-to-start number of rows between captured windows (may
+        overlap with other windows).
     channel: str
         Channel column to be analyzed.
     fs: int (default: 10000)
@@ -203,29 +260,36 @@ def epoch_pgram(epoch_df, channel, fs=10e3):
 
     References
     ----------
-    [1] https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.signal.periodogram.html
+    [1] https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/
+    scipy.signal.periodogram.html
     """
 
-    pgram_f_arrays = []
-    pgram_den_arrays = []
+    # set up basic containers and inputs
+    f_arrays = []
+    den_arrays = []
     fs = int(fs)
-    sweep_names = epoch_df.index.levels[0].values
-    epoch_names = epoch_df.index.levels[1].values
-    total_epochs = len(sweep_names)*len(epoch_names)
-    epoch_size = epoch_df.ix['sweep001'][channel].xs('epoch001').size
-    idx = (np.arange((epoch_size/2)+1))
-    arrays = [sweep_names,epoch_names,idx]
-    index = pd.MultiIndex.from_product(arrays,names=['sweep','epoch',None])
-    data = epoch_df[channel].values
 
-    for i in range(total_epochs):
-        pgram_f, pgram_den = periodogram(data[(i*epoch_size):\
-        ((i+1)*epoch_size)], fs)
-        pgram_f_arrays.append(pgram_f)
-        pgram_den_arrays.append(pgram_den)
-    pgram_f_concat = np.concatenate(pgram_f_arrays,axis=0)
-    pgram_den_concat = np.concatenate(pgram_den_arrays,axis=0)
-    data = list(zip(pgram_f_concat,pgram_den_concat))
-    df = pd.DataFrame(data,columns=['frequency',channel])
+    epochs = _create_epoch(df, window, step)
+    sweep_names, epoch_names = _epoch_data(df, window, step)
+
+    # set up indicies for returned dataframe (just easier to remake them here)
+    idx = np.arange((window/2)+1)
+    arrays = [sweep_names, epoch_names, idx]
+    index = pd.MultiIndex.from_product(arrays, names=['sweep', 'epoch', None])
+
+    for epoch in epochs:
+        f, den = periodogram(epoch[channel], fs)
+        f_arrays.append(f)
+        den_arrays.append(den)
+
+    # stitch the arrays together
+    f_concat = np.concatenate(f_arrays, axis=0)
+    den_concat = np.concatenate(den_arrays, axis=0)
+    data = list(zip(f_concat, den_concat))
+
+    # turn them into a dataframe with the correct column labels
+    df = pd.DataFrame(data, columns=['frequency', channel])
+
+    # add the correct multiindex labeling
     df.set_index(index, inplace=True)
     return df
