@@ -77,6 +77,7 @@ def clean_axis(ax, y_units, **y_hline):
                    label='{0}: {1} {2}'.format(key,val,y_units))
 
 
+
 def clean_figure(f, y_units, **y_hline):
     """
     Removes all axis lines and tick marks for all axes in a matplolib figure.
@@ -110,6 +111,7 @@ def clean_figure(f, y_units, **y_hline):
                                   '{0}: {1} {2}'.format(key,val,y_units))
 
 
+
 def nu_legend(f, x_scale, x_units, y_scale, y_units):
     """
     Add x and y scale bars to the bottom right of the only/last subplot of a
@@ -139,6 +141,7 @@ def nu_legend(f, x_scale, x_units, y_scale, y_units):
     y_range = abs(y_min-y_max)
     hline_min = (x_scale/x_range)
     vline_max = (y_scale/y_range)
+<<<<<<< HEAD
     ax.axhline(y=y_min,xmin=(1-hline_min),xmax=1,color='black',lw=2,
                label='x: {0} {1}'.format(x_scale,x_units))
     ax.axvline(x=x_max,ymin=0,ymax=vline_max,color='black',lw=2,
@@ -148,6 +151,16 @@ def nu_legend(f, x_scale, x_units, y_scale, y_units):
 
 def nu_boxplot(ax, df, cmap=False, color_list=False,
                medians_only=False, no_x=False, show_outliers=True, **y_hline):
+=======
+    ax.axhline(y=y_min,xmin=(1-hline_min),xmax=1,color='black',lw=0.5,label=\
+    'x: {0} {1}'.format(x_scale,x_units))
+    ax.axvline(x=x_max,ymin=0,ymax=vline_max,color='black',lw=0.5,label=\
+    'y: {0} {1}'.format(y_scale,y_units))
+    legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0, frameon=False)
+
+
+def nu_boxplot(ax, df, cmap=False, color_list=False, medians_only=False, no_x=False, show_outliers=True, **y_hline):
+>>>>>>> master
     """
     Makes a much improved boxplot. Whiskers set at 10/90 percentiles.
 
@@ -185,6 +198,8 @@ def nu_boxplot(ax, df, cmap=False, color_list=False,
 
     TODO:
     - move xaxis labels to left an option
+    - CHANGE OUTLIERS TO SOMETHING MORE COMPATIBLE WITH ILLUSTRATOR. MAYBE DECREASE SIZE WHILE INCREASING LINEWIDTH TO MAKE ILLUSION OF FILLED CIRCLE, BUT WON'T RUN INTO PROBLEM WHEN CHANGING COLOR IN THE PROGRAM?
+    - also need to make work with pd.Series since it apparently doesn't like to (easy fix. if Series, then pd.Dataframe(Series). should work just fine)
     """
     # remake data into list of lists. compensates for differing column sizes.
     columns = df.columns
@@ -202,6 +217,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False,
     # make the basic figure with better default properties.
     # first line are pd.df.boxplot specific params, then general mpl params
     bp = ax.boxplot(series_array,
+<<<<<<< HEAD
                     boxprops=dict(color='000000',linestyle='-',linewidth=2),
                     capprops=dict(color='000000',linestyle='-',linewidth=2),
                     flierprops=dict(linestyle='none',marker='.',
@@ -209,10 +225,19 @@ def nu_boxplot(ax, df, cmap=False, color_list=False,
                                     markerfacecolor='000000',markersize=5),
                     medianprops=dict(color='000000',linestyle='-',
                                      linewidth=4),
+=======
+                    boxprops=dict(color='000000',linestyle='-',linewidth=1),
+                    capprops=dict(color='000000',linestyle='-',linewidth=1),
+                    flierprops=dict(linestyle='none',marker='.',\
+                    markeredgecolor='none',markerfacecolor='000000',\
+                    markersize=5),
+                    medianprops=dict(color='000000',linestyle='-',\
+                    linewidth=3),
+>>>>>>> master
                     showfliers=show_outliers,
                     widths=0.5,
                     whis=[10,90],
-                    whiskerprops=dict(color='000000',linestyle='-',linewidth=2
+                    whiskerprops=dict(color='000000',linestyle='-',linewidth=1
                     ))
     # make color cycler
     if cmap:
@@ -242,8 +267,13 @@ def nu_boxplot(ax, df, cmap=False, color_list=False,
             mpl.artist.setp(bp['whiskers'][i*2],color=color)
             mpl.artist.setp(bp['whiskers'][i*2+1],color=color)
             if show_outliers:
+<<<<<<< HEAD
                 mpl.artist.setp(bp['fliers'][i],markerfacecolor=color,
                                 markeredgecolor=color)
+=======
+                mpl.artist.setp(bp['fliers'][i],markerfacecolor=color,\
+                markeredgecolor='none')
+>>>>>>> master
     # add in an optional line
     for key, val in y_hline.items():
         ax.axhline(y=val,color='grey',linestyle='dotted')
@@ -256,9 +286,14 @@ def nu_boxplot(ax, df, cmap=False, color_list=False,
     return bp
 
 
+<<<<<<< HEAD
 def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05,
                markersize=8, monocolor=False, no_x=False, paired=False,
                seed=0):
+=======
+def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05,\
+markersize=8, monocolor=False, no_x=False, paired=False, seed=0):
+>>>>>>> master
     """
     Creates a scatter column plot.
 
@@ -357,7 +392,7 @@ def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05,
                      markeredgewidth=0)
         if monocolor:
             mpl.artist.setp(sc[0],\
-            markeredgecolor=monocolor,markerfacecolor=monocolor)
+            markeredgecolor='none',markerfacecolor=monocolor)
     # make final changes to plot to clean it up and make it pretty
     ax.set_xlim(0.5, column_num+0.5)
     ax.xaxis.set_ticks(np.arange(1, column_num+1))
@@ -396,6 +431,7 @@ def nu_raster(ax, df, color='00000', **x_vline):
     making-raster-plots-in-python-with-matplotlib/
 
     TODO:
+    - MAKE TIDY DATA COMPLIANT/work well with pacemaking module
     - y label?
     - bottom up option?
     - line weight?
@@ -419,8 +455,12 @@ def nu_raster(ax, df, color='00000', **x_vline):
     return ras
 
 
+<<<<<<< HEAD
 def nu_violin(ax, df, cmap=False, color_list=False, no_x=False,
               outline_only=False, rug=False, **y_hline):
+=======
+def nu_violin(ax, df, cmap=False, color_list=False, no_x=False,outline_only=False, rug=False, **y_hline):
+>>>>>>> master
     """
     Makes a much improved boxplot.
 

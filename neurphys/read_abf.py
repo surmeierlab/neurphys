@@ -32,21 +32,21 @@ def read_abf(filepath):
     bl = r.read_block(lazy=False, cascade=True)
     num_channels = len(bl.segments[0].analogsignals)
     channels = ['primary']
-    signals = []
     df_list = []
+    signals = []
     sweep_list = []
 
     for seg_num, seg in enumerate(bl.segments):
+        channels = ['primary']+['channel_{0}'.format(str(i+1)) for i in range(num_channels-1)]
+        signals = []
         for i in range(num_channels):
             signals.append(bl.segments[seg_num].analogsignals[i])
-            if i >= 1:
-                channels.append('channel_'+str(i))
         data_dict = dict(zip(channels, signals))
         time = seg.analogsignals[0].times - seg.analogsignals[0].times[0]
         data_dict['time'] = time
         df = pd.DataFrame(data_dict)
         df_list.append(df)
-        sweep_list.append('sweep'+str(seg_num+1).zfill(3))
+        sweep_list.append('sweep' + str(seg_num + 1).zfill(3))
     df = pd.concat(df_list, keys=sweep_list, names=['sweep'])
     return df
 

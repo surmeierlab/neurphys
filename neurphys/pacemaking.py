@@ -140,7 +140,7 @@ def baseline_pacemaking(df, n=200):
     return df
 
 
-def calc_freq(df, mph, valley=False, hz=True,
+def calc_freq(df, mph, mpd, valley=False, hz=True,
               ret_indices=False, ret_times=False):
     """Calculate instantaneous frequency of events exceeding a specific height
 
@@ -168,12 +168,13 @@ def calc_freq(df, mph, valley=False, hz=True,
     frequency array. indices and times are returned ordered in that
     order in list if both are desired (i.e. ret_vals[1] and ret_vals[2])
     """
+
     ret_vals = []
     if valley:
         indices = detect_peaks(df['primary'].values, mph=abs(mph),
-                               valley=valley, mpd=100)
+                               valley=valley, mpd=mpd)
     else:
-        indices = detect_peaks(df['primary'].values, mph=mph, mpd=100)
+        indices = detect_peaks(df['primary'].values, mph=mph, mpd=mpd)
     times = df['time'].ix[indices].values
     times_dif = times[1:] - times[:-1]
 
@@ -188,3 +189,147 @@ def calc_freq(df, mph, valley=False, hz=True,
         ret_vals.append(times[1:])
 
     return ret_vals[0] if len(ret_vals) == 1 else ret_vals
+
+
+def _fixed_shift(idx_array, shifts, false_array=False):
+    """
+    Create a series of arrays that shift the input array by a specified index
+    amount. ARRAY ELEMENTS ARE MASKED IF THEY OVERLAP WITH THE NEXT
+    SUCCESSIVE ELEMENT in the original array (the 'true_array'). Masked
+    elements ('false_array') can be output as their own array if necessary.
+
+    Parameters
+    ----------
+    idx_array: 1D numpy array
+        base input array of ascending values (ideally from
+        nu.pacemaking.detect_peaks(), but doesn't have to be).
+    shifts: ascending array of int(s)
+        array of specified distances to shift the input array. distances
+        should be the same value as input indicies (i.e. if successive
+        indicies are 1 ms apart, the shift array should be in the same units).
+    false_array: bool (default False)
+        just determines if you want to return an array specifying
+        what idx_array values are being left out due to being longer than
+        successive idx_array values.
+
+    Return
+    ------
+    fixed_true_idxs: list of numpy arrays
+        masked numpy arrays containing the appropriate shifts
+    fixed_false_idxs_idx: list of numpy arrays
+        numpy arrays containing the masked values
+
+    TODO
+    - check if 'shifts' values are integers
+    - need to update for 2D arrays
+    - turn fixed_true_idxs and fixed_false_idxs to 2D numpy arrays? - currently thinking no for the sake of simplicity
+    """
+
+    fixed_arrays = [idx_array + shift for shift in shifts]
+
+    fixed_trues  = [fixed_array[:-1] <= idx_array[1:] for fixed_array in fixed_arrays]
+    fixed_falses = [np.invert(fixed_true) for fixed_true in fixed_trues]
+
+    fixed_true_idxs  = [fixed_arrays[i][:-1][fixed_trues[i]] for i,_ in enumerate(fixed_arrays)]
+    fixed_false_idxs = [fixed_arrays[i][:-1][fixed_falses[i]] for i,_ in enumerate(fixed_arrays)]
+
+    if false_array == True:
+        return fixed_true_idxs, fixed_false_idxs
+    else:
+        return fixed_true_idxs
+
+
+def _percent_shift(idx_array, percentiles):
+    """
+    Shift an array by percentage of the difference between successive
+    array elements.
+        Note: considering this is made specifically for building
+        masking arrays for pandas dataframes, the returned elements
+        are all rounded to the nearest integer using standard numpy
+        rounding rules.
+
+    Parameters
+    ----------
+    idx_array: array (ideally numpy array)
+        base input array of ascending values (ideally from
+        nu.pacemaking.detect_peaks(), but doesn't have to be).
+    percentiles: acending array of fractions
+        an array of the fractions of distances to shift the input idx_array
+
+    Return
+    ------
+    percent_idx: list of numpy arrays
+        masked numpy arrays containing the appropriate shifts
+
+    References
+    ----------
+
+    TODO:
+    - check 'percentiles' so that they're what they should be (don't on second thought, users should be able to use them how they wish)
+    - turn percent_idxs into 2D numpy array? - currently thinking no for the sake of simplicity
+    """
+
+    shift = np.roll(idx_array,1)
+    diff_array = idx_array - shift
+
+    percent_arrays = [(diff_array*percent).astype(int) for percent in percentiles]
+    percent_idxs   = [idx_array[:-1]+percent_arrays[i][1:] for i,_ in enumerate(percent_arrays)]
+
+    return percent_idxs
+
+
+def iei_arrays(idx_array, shifts=False, percentiles=False):
+    """
+    Creates a dictionary containing an input array that has been shifted by
+    user-specified amounts, ideally used for masking previously created
+    dataframes.
+
+    iei = inter-event interval
+
+    Parameters
+    ----------
+    idx_array: array (ideally numpy array)
+        base input array of ascending values (ideally from
+        nu.pacemaking.detect_peaks(), but doesn't have to be).
+    shifts: ascending array of int(s)
+        array of specified distances to shift the input array. distances
+        should be the same value as input indicies (i.e. if successive
+        indicies are 1 ms apart, the shift array should be in the same units).
+    percentiles: acending array of fractions
+        an array of the fractions of distances to shift the input idx_array
+
+    Return
+    ------
+    fixed_dict: dict of numpy arrays
+        dictionary of shifted arrays where keys are in the form 'fixed_X'
+    percent_dict: dict of numpy arrays
+        dictionary of shifted arrays where keys are in the form 'percen_X.XX'
+
+    References
+    ----------
+
+    TODO:
+    - assign fixed_dict to an collections.OrderedDict()? this is probably a good idea
+    """
+
+    fixed_true_idxs = []
+    try:
+        fixed_true_idxs = _fixed_shift(idx_array, shifts)
+        fixed_dict = {'fixed_{0}'.format(val): fixed_true_idxs[i] for i,val in enumerate(shifts)}
+    except:
+        pass
+
+    percent_idxs = []
+    try:
+        percent_idxs = _percent_shift(idx_array, percentiles)
+        percent_dict = {'percen_{0:.2f}'.format(val): percent_idxs[i] for i,val in enumerate(percentiles)}
+    except:
+        pass
+
+    try:
+        return {**fixed_dict, **percent_dict} # the easiest way to merge dictionaries
+    except:
+        try:
+            return fixed_dict
+        except:
+            return percent_dict

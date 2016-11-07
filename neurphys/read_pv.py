@@ -17,13 +17,13 @@ def _get_ephys_vals(element):
         unit = element.find('.//UnitName').text
         divisor = float(element.find('.//Divisor').text)
 
-        return 'primary', {'unit': unit, 'divisor': divisor}
+        return unit, divisor
 
     elif ch_type == '1':
         unit = element.find('.//UnitName').text
         divisor = float(element.find('.//Divisor').text)
 
-        return 'secondary', {'unit': unit, 'divisor': divisor}
+        return unit, divisor
 
 
 def parse_xml(filename):
@@ -35,21 +35,25 @@ def parse_xml(filename):
 
     file_attr = {}
     ch_names = []
+    divisors = {}
+    units = {}
     for ch in enabled_ch:
         parent = ch.getparent()
         if parent.find('.//Type').text == 'Physical':
             clamp_device = parent.find('.//PatchclampDevice').text
-
+            name = parent.find('.//Name').text.lower()
+            ch_names.append(name)
+            
             if clamp_device is not None:
-                name, ephys_vals = _get_ephys_vals(parent)
-                file_attr[name] = ephys_vals
-
+                unit, divisor = _get_ephys_vals(parent)
+                divisors[name] = divisor
+                units[name] = unit
             else:
-                name = parent.find('.//Name').text
-
-            ch_names.append(name.lower())
-
+                units[name] = 'V'
+            
     file_attr['channels'] = ch_names
+    file_attr['divisors'] = divisors
+    file_attr['units'] = units
     # gets sampling rate
     file_attr['sampling'] = int((tree.find('.//Rate')).text)
     # gets recording time, converts to sec
@@ -79,7 +83,7 @@ def parse_xml(filename):
     return file_attr
 
 
-def import_vr_csv(filename, col_names, primary_div=1, secondary_div=1):
+def import_vr_csv(filename, col_names, divisors):
     """
     Reads voltage recording .csv file into a pandas dataframe.
     Will convert primary and secondary channels to appropriate values if those
@@ -87,14 +91,12 @@ def import_vr_csv(filename, col_names, primary_div=1, secondary_div=1):
 
     Returns a dataframe
     """
-
+    col_names = ['time'] + col_names
     df = pd.read_csv(filename, names=col_names, skiprows=1)
     df.time /= 1000
 
-    if "primary" in df.columns:
-        df.primary /= primary_div
-    if "secondary" in df.columns:
-        df.secondary /= secondary_div
+    for ch, divisor in divisors.items():
+        df[ch] /= divisor
 
     return df
 
@@ -150,12 +152,10 @@ def import_folder(folder):
                 vr_filename = os.path.join(folder,
                                            (file_vals['voltage recording file']
                                             + '.csv'))
-                col_names = ['time'] + file_vals['channels']
-                primary_divisor = file_vals['primary']['divisor']
-                secondary_divisor = file_vals['secondary']['divisor']
-
-                df_vr = import_vr_csv(vr_filename, col_names, primary_divisor,
-                                      secondary_divisor)
+                
+                df_vr = import_vr_csv(vr_filename,
+                                      file_vals['channels'],
+                                      file_vals['divisors'])
 
                 data_vr.append(df_vr)
 

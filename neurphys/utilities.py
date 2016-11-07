@@ -89,18 +89,18 @@ def calc_decay(df, peak, peak_time, return_plot_vals=False):
         index1 = peak_sub[peak_sub.primary >= peak * 0.90].index[0]
         index2 = peak_sub[peak_sub.primary >= peak * 0.05].index[0]
         fit_sub = peak_sub.ix[index1:index2]
-        guess = np.array([-1, 1e3, -1, 1e3])
+        guess = np.array([-1, 1e-4, -1, 1e-4])
 
     else:
         index1 = peak_sub[peak_sub.primary <= peak * 0.90].index[0]
         index2 = peak_sub[peak_sub.primary <= peak * 0.05].index[0]
         fit_sub = peak_sub.ix[index1:index2]
-        guess = np.array([1, 1e3, 1, 1e3])
+        guess = np.array([1, 1e-4, 1, 1e-4])
 
     x_zeroed = fit_sub.time - fit_sub.time.values[0]
 
     def exp_decay(x, a, b, c, d):
-        return a*np.exp(-b*x) + c*np.exp(-d*x)
+        return a*np.exp(-x/b) + c*np.exp(-x/d)
 
     popt, pcov = curve_fit(exp_decay, x_zeroed, fit_sub.primary, guess)
 
@@ -108,9 +108,9 @@ def calc_decay(df, peak, peak_time, return_plot_vals=False):
     y_curve = exp_decay(x_full_zeroed, *popt)
 
     amp1 = popt[0]
-    tau1 = 1/popt[1]
+    tau1 = popt[1]
     amp2 = popt[2]
-    tau2 = 1/popt[3]
+    tau2 = popt[3]
 
     tau = ((tau1*amp1)+(tau2*amp2))/(amp1+amp2)
 
