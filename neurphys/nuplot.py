@@ -76,6 +76,7 @@ def clean_axis(ax, y_units, **y_hline):
         ax.axhline(y=val,color='grey',linestyle='dotted',
                    label='{0}: {1} {2}'.format(key,val,y_units))
 
+
 def clean_figure(f, y_units, **y_hline):
     """
     Removes all axis lines and tick marks for all axes in a matplolib figure.
@@ -107,6 +108,7 @@ def clean_figure(f, y_units, **y_hline):
                 f.axes[i].axhline(y=val,color='grey',
                                   linestyle='dotted',label=
                                   '{0}: {1} {2}'.format(key,val,y_units))
+
 
 def nu_legend(f, x_scale, x_units, y_scale, y_units):
     """
@@ -142,6 +144,7 @@ def nu_legend(f, x_scale, x_units, y_scale, y_units):
     ax.axvline(x=x_max,ymin=0,ymax=vline_max,color='black',lw=2,
                label='y: {0} {1}'.format(y_scale,y_units))
     legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0, frameon=False)
+
 
 def nu_boxplot(ax, df, cmap=False, color_list=False,
                medians_only=False, no_x=False, show_outliers=True, **y_hline):
@@ -254,6 +257,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False,
         ax.spines['bottom'].set_visible(False)
         ax.get_xaxis().set_visible(False)
     return bp
+
 
 def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05,
                markersize=8, monocolor=False, no_x=False, paired=False,
@@ -417,6 +421,7 @@ def nu_raster(ax, df, color='00000', **x_vline):
     simple_axis(ax)
     return ras
 
+
 def nu_violin(ax, df, cmap=False, color_list=False, no_x=False,
               outline_only=False, rug=False, **y_hline):
     """
@@ -525,3 +530,74 @@ def nu_violin(ax, df, cmap=False, color_list=False, no_x=False,
         ax.spines['bottom'].set_visible(False)
         ax.get_xaxis().set_visible(False)
     return vio
+
+
+def nu_specheatmap(ax, df, sweep='sweep001', align='left', cmap='gray'):
+    """
+    Produce heatmap from spectrogram function.
+
+    Parameters
+    ----------
+    ax:
+        matplotlib axes object
+    df: pandas DataFrame
+        Pandas Dataframe where DESCRIPTION
+    sweep: str (default: 'sweep001')
+        DESCRIPTION
+    align: str (default: 'left')
+        DESCRIPTION
+    cmap: any valid matplotlib cmap (default: 'gray')
+        I picked one because the standard default is awful.
+    """
+
+    t = df.xs(sweep).columns
+    f = df.xs(sweep).index
+    data = df.xs(sweep).values
+
+    if align == 'center':
+        t += ((nperseg/fs)/2) - 0.5
+    elif align == 'right':
+        t += ((nperseg/fs)) - 1
+    elif align not in ('left','center','right'):
+        raise ValueError('Not a recognized variable. Check the docs.')
+
+    hm = plt.pcolormesh(t, f, data, cmap=cmap)
+    simpleaxis(ax)
+    return hm
+
+
+def nu_genheatmap(ax, df, xlim=None, ylim=None, cmap='gray'):
+    """
+    Produce heatmap from a unlabeled dataframe. x and y limits
+    are determined by standard pandas integer-based indexing.
+
+    Think of the dataframe as xy coordinates. This function plots
+    data each column as df[j][::-1].
+
+    Parameters
+    ----------
+    ax:
+        matplotlib axes object
+    df: pandas DataFrame
+        Pandas Dataframe where DESCRIPTION.
+    xlim:
+        DESCRIPTION
+    ylim:
+        DESCRIPTION
+    cmap: any valid matplotlib cmap (default: 'gray')
+        I picked one because the standard default is awful.
+    """
+
+    if xlim is not None:
+        df = df.iloc[:,xlim[0]:xlim[1]]
+    if ylim is not None:
+        df = df.iloc[ylim[0]:ylim[1],:]
+
+    vals = df.values
+    rows = np.arange(vals.shape[0])
+    cols = np.arange(vals.shape[1])
+    ROWS, COLS = np.meshgrid(rows, cols, indexing='ij')
+
+    hm = plt.pcolormesh(COLS, ROWS, vals, cmap=cmap)
+    simpleaxis(ax)
+    return hm

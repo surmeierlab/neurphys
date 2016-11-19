@@ -293,3 +293,47 @@ def epoch_pgram(df, window, step, channel, fs=10e3):
     # add the correct multiindex labeling
     df.set_index(index, inplace=True)
     return df
+
+
+def nu_spectrogram(df, window, step, channel, fs, f_trim=(0,100)):
+    """
+    Parameters
+    ----------
+    df: DataFrame
+        Pandas Dataframe from 'read_abf/pv' function.
+    window: int
+        Epoch size based on array index.
+    step: int
+        Start-to-start number of rows between captured windows (may
+        overlap with other windows).
+    channel: str
+        Channel column to be analyzed.
+    fs: int (default: 10000)
+        Sampling frequency (Hz).
+    f_trim: tuple
+        Range of returned frequency bands.
+
+    Returns
+    -------
+    df :
+        Spectrogram of DataFrame column labeled with frequencies added as row
+        indicies and columns as segment times (left aligned).
+    """
+
+    noverlap = nperseg - step
+    f_trim = f_trim
+    # make sure window and step are integers
+    window, step = int(window), int(step)
+    df_list = []  # change to a dict once Py3.6 becomes common?
+    sweeps = df.index.levels[0].values
+
+    for sweep in sweeps:
+        # compute the spectrogram. f=sample frequencies, t=segment times
+        f, t, Sxx = signal.spectrogram(df[channel].xs(sweep),
+                                       fs, nperseg=window, noverlap=noverlap)
+        t -= t[0]  # left align the spectrogram time values
+        df_list.append(
+        pd.DataFrame(Sxx,index=f,columns=t).loc[f_trim[0]:f_trim[1]])
+
+    df = pd.concat(df_list, keys=sweeps, names=['sweep'])
+    return df
