@@ -295,7 +295,7 @@ def epoch_pgram(df, window, step, channel, fs=10e3):
     return df
 
 
-def nu_spectrogram(df, window, step, channel, fs, f_trim=(0,100)):
+def nu_spectrogram(df, window, step, channel, fs=10e3, f_trim=(0,100)):
     """
     Parameters
     ----------
@@ -308,9 +308,9 @@ def nu_spectrogram(df, window, step, channel, fs, f_trim=(0,100)):
         overlap with other windows).
     channel: str
         Channel column to be analyzed.
-    fs: int (default: 10000)
+    fs: int (default: 10kHz)
         Sampling frequency (Hz).
-    f_trim: tuple
+    f_trim: tuple (min, max)
         Range of returned frequency bands.
 
     Returns
@@ -321,9 +321,8 @@ def nu_spectrogram(df, window, step, channel, fs, f_trim=(0,100)):
     """
 
     noverlap = nperseg - step
-    f_trim = f_trim
-    # make sure window and step are integers
-    window, step = int(window), int(step)
+    # make sure necessary inputs are integers
+    window, step, fs = int(window), int(step), int(fs)
     df_list = []  # change to a dict once Py3.6 becomes common?
     sweeps = df.index.levels[0].values
 

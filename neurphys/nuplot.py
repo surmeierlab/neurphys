@@ -58,7 +58,7 @@ def clean_axis(ax, y_units, **y_hline):
     ----------
     ax:
         Matplotlib axes object.
-    y_units: string
+    y_units: str
         The units you want listed in your legend for the y_hline(s).
     y_hline: key-value pair or None (default)
         Draws an arbitrary number of dotted horizontal lines at a user
@@ -85,7 +85,7 @@ def clean_figure(f, y_units, **y_hline):
     ----------
     f:
         Matplotlib figure object.
-    y_units: string
+    y_units: str
         The units you want listed in your legend for the y_hline(s).
     y_hline: key-value pair or None (default)
         Draws an arbitrary number of dotted horizontal lines at a user
@@ -121,11 +121,11 @@ def nu_legend(f, x_scale, x_units, y_scale, y_units):
         Matplotlib figure object.
     x_scale: int or float
         User specified length of the scale bar.
-    x_units: string
+    x_units: str
         X-axis units used in the figure legend.
     y_scale: int or float
         User specified length of the scale bar.
-    y_units: string
+    y_units: str
         Y-axis units used in the figure legend.
 
     TODO:
@@ -154,7 +154,7 @@ def nu_boxplot(ax, df, cmap=False, color_list=False,
     Parameters
     ----------
     ax:
-        matplotlib axes object
+        Matplotlib axes object.
     df: pandas DataFrame
         Pandas Dataframe where each column makes a separate boxplot. Column
         names will be used as x-axis labels.
@@ -185,9 +185,13 @@ def nu_boxplot(ax, df, cmap=False, color_list=False,
 
     TODO:
     - move xaxis labels to left an option
-    - CHANGE OUTLIERS TO SOMETHING MORE COMPATIBLE WITH ILLUSTRATOR. MAYBE DECREASE SIZE WHILE INCREASING LINEWIDTH TO MAKE ILLUSION OF FILLED CIRCLE, BUT WON'T RUN INTO PROBLEM WHEN CHANGING COLOR IN THE PROGRAM?
-    - also need to make work with pd.Series since it apparently doesn't like to (easy fix. if Series, then pd.Dataframe(Series). should work just fine)
+    - CHANGE OUTLIERS TO SOMETHING MORE COMPATIBLE WITH ILLUSTRATOR. MAYBE
+     DECREASE SIZE WHILE INCREASING LINEWIDTH TO MAKE ILLUSION OF FILLED
+     CIRCLE, BUT WON'T RUN INTO PROBLEM WHEN CHANGING COLOR IN THE PROGRAM?
+    - also need to make work with pd.Series since it apparently doesn't like
+    to (easy fix. if Series, then pd.Dataframe(Series). should work just fine)
     """
+
     # remake data into list of lists. compensates for differing column sizes.
     columns = df.columns
     series_array = []
@@ -268,7 +272,7 @@ def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05,
     Parameters
     ----------
     ax:
-        Matplotlib axes object
+        Matplotlib axes object.
     df: pandas DataFrame
         Pandas Dataframe where each column makes a separate scatter column
         plot. Column names will be used as x-axis labels.
@@ -371,6 +375,7 @@ def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05,
         ax.get_xaxis().set_visible(False)
     return sc
 
+
 def nu_raster(ax, df, color='00000', **x_vline):
     """
     Creates a raster plot that reads top-down and left-right.
@@ -378,11 +383,12 @@ def nu_raster(ax, df, color='00000', **x_vline):
     Parameters
     ----------
     ax:
-        Matplotlib ax object
+        Matplotlib ax object.
     df: pandas DataFrame
         Pandas Dataframe where each column makes a separate raster plot. THE
         PLOT WILL READ IN THE EXACT SAME MANNER AS 'df.T' LOOKS.
-    color: any valid matplotlib color
+    color: any valid matplotlib color (default: black)
+        Color of your raster lines.
     x_vline: key-value pair or None (default=None)
         Draws an arbitrary number of dotted horizontal lines at user specified
         y-value that spans the entire length of the figure.
@@ -430,11 +436,11 @@ def nu_violin(ax, df, cmap=False, color_list=False, no_x=False,
     Parameters
     ----------
     ax:
-        matplotlib axes object
+        Matplotlib axes object.
     df: pandas DataFrame
         Pandas Dataframe where each column makes a separate boxplot. Column
         names will be used as x-axis labels.
-    cmap: string (or direct call)
+    cmap: str (or direct call)
         Any valid matplotlib colormap (ex: 'afmhot' or 'viridis'). Can also
         call through direct mpl.cm.<colormap_name>.
     color_list: list
@@ -539,21 +545,33 @@ def nu_specheatmap(ax, df, sweep='sweep001', align='left', cmap='gray'):
     Parameters
     ----------
     ax:
-        matplotlib axes object
+        Matplotlib axes object.
     df: pandas DataFrame
-        Pandas Dataframe where DESCRIPTION
+        Pandas Dataframe generated from oscillation.nu_spectrogram function.
     sweep: str (default: 'sweep001')
-        DESCRIPTION
+        Sweep to be plotted.
     align: str (default: 'left')
-        DESCRIPTION
+        If plotting spectrogram alongside original signal, time values for
+        the spectrogram windows can be aligned with time values of the
+        signal. 'Left' aligns the left side of each spectrogram window to the
+        left side of each signal window. With that explained, I'm pretty sure
+        you can figure out what 'center' and 'right' do. If not, please pick
+        a new line of work.
     cmap: any valid matplotlib cmap (default: 'gray')
         I picked one because the standard default is awful.
+
+    Returns
+    -------
+    hm: matplotlib QuadMesh object
+        QuadMesh plot.
     """
 
+    # pull necessary variables for plotting from dataframe
     t = df.xs(sweep).columns
     f = df.xs(sweep).index
     data = df.xs(sweep).values
 
+    # modify time values to customize the plot
     if align == 'center':
         t += ((nperseg/fs)/2) - 0.5
     elif align == 'right':
@@ -568,36 +586,45 @@ def nu_specheatmap(ax, df, sweep='sweep001', align='left', cmap='gray'):
 
 def nu_genheatmap(ax, df, xlim=None, ylim=None, cmap='gray'):
     """
-    Produce heatmap from a unlabeled dataframe. x and y limits
+    Create a heatmap from a unlabeled dataframe. x and y limits
     are determined by standard pandas integer-based indexing.
 
     Think of the dataframe as xy coordinates. This function plots
-    data each column as df[j][::-1].
+    the data as df[::-1].
 
     Parameters
     ----------
     ax:
         matplotlib axes object
     df: pandas DataFrame
-        Pandas Dataframe where DESCRIPTION.
-    xlim:
-        DESCRIPTION
-    ylim:
-        DESCRIPTION
+        Unlabeled pandas dataframe.
+    xlim: tuple (min, max) (default: None)
+        X-limits for the plot. Best to use in this manner over setting
+        the 'set_xlim' attribute on the axes.
+    ylim: tuple (min, max) (default: None)
+        Y-limits for the plot. Best to use in this manner over setting
+        the 'set_ylim' attribute on the axes.
     cmap: any valid matplotlib cmap (default: 'gray')
         I picked one because the standard default is awful.
+
+    Returns
+    -------
+    hm: matplotlib QuadMesh object
+        QuadMesh plot.
     """
 
+    # truncate dataframe
     if xlim is not None:
         df = df.iloc[:,xlim[0]:xlim[1]]
     if ylim is not None:
         df = df.iloc[ylim[0]:ylim[1],:]
 
+    # pull necessary values from dataframe
     vals = df.values
     rows = np.arange(vals.shape[0])
     cols = np.arange(vals.shape[1])
-    ROWS, COLS = np.meshgrid(rows, cols, indexing='ij')
+    i, j = np.meshgrid(rows, cols, indexing='ij')
 
-    hm = plt.pcolormesh(COLS, ROWS, vals, cmap=cmap)
+    hm = plt.pcolormesh(j, i, vals, cmap=cmap)
     simpleaxis(ax)
     return hm
