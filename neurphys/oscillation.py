@@ -3,6 +3,7 @@ Functions for analyzing oscillatory activity.
 """
 
 import numpy as np
+from scipy import signal
 from scipy.signal import periodogram
 from scipy.stats import gaussian_kde
 import pandas as pd
@@ -320,9 +321,9 @@ def nu_spectrogram(df, window, step, channel, fs=10e3, f_trim=(0,100)):
         indicies and columns as segment times (left aligned).
     """
 
-    noverlap = nperseg - step
     # make sure necessary inputs are integers
     window, step, fs = int(window), int(step), int(fs)
+    noverlap = window - step
     df_list = []  # change to a dict once Py3.6 becomes common?
     sweeps = df.index.levels[0].values
 

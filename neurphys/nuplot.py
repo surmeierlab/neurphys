@@ -3,6 +3,7 @@ Plotting helper functions for publication quality figures.
 """
 
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 from matplotlib.pyplot import legend
 import numpy as np
 from cycler import cycler
@@ -580,7 +581,7 @@ def nu_specheatmap(ax, df, sweep='sweep001', align='left', cmap='gray'):
         raise ValueError('Not a recognized variable. Check the docs.')
 
     hm = plt.pcolormesh(t, f, data, cmap=cmap)
-    simpleaxis(ax)
+    simple_axis(ax)
     return hm
 
 
@@ -626,5 +627,5 @@ def nu_genheatmap(ax, df, xlim=None, ylim=None, cmap='gray'):
     i, j = np.meshgrid(rows, cols, indexing='ij')
 
     hm = plt.pcolormesh(j, i, vals, cmap=cmap)
-    simpleaxis(ax)
+    simple_axis(ax)
     return hm
