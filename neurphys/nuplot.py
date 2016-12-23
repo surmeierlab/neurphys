@@ -14,6 +14,8 @@ from itertools import cycle
 # like pandas-profiling - also check the way Seaborn does it
 # matplotlib.style.use(resource_filename(__name__, "estep_style.mplstyle"))
 
+# try/except block with 'estep_style' and except warning to install it
+
 
 def simple_axis(ax):
     """
