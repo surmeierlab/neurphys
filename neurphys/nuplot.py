@@ -407,25 +407,25 @@ def nu_raster(ax, df, color='00000', **x_vline):
     making-raster-plots-in-python-with-matplotlib/
 
     TODO:
-    - MAKE TIDY DATA COMPLIANT/work well with pacemaking module
     - y label?
     - bottom up option?
     - line weight?
     - dotted line color/weight?
     """
 
+    data = df.T.values
     if df.ndim == 1:
-        ras = ax.vlines(df.T.values,0.5,1.5,color=color)
+        ras = ax.vlines(data,0.5,1.5,color=color)
+        ax.set_ylim(0.5, 1.5)
+        ax.set_xlim(df.dropna().min(), df.dropna().max())
     else:
-        data = df.T.values
         for i, sweep in enumerate(data):
-            ras = ax.vlines(sweep,i+0.5,i+1.5,color=color)
+            ras = ax.vlines(sweep, i+0.5, i+1.5, color=color)
+        ax.set_ylim(0.5, len(data)+0.5)
+        ax.set_yticks(np.arange(1, data.shape[0]+1, 1))
     # add in an optional line
     for key, val in x_vline.items():
-        ax.axvline(x=val,color='grey',linestyle='dotted')
-    # set up the axis and labels so that they properly label sweeps
-    ax.set_ylim(0.5,len(data)+0.5)
-    ax.set_yticks(np.arange(1,data.shape[0]+1,1))
+        ax.axvline(x=val, color='grey', linestyle='dotted')
     ax.invert_yaxis()
     simple_axis(ax)
     return ras
