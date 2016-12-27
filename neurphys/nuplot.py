@@ -4,7 +4,6 @@ Plotting helper functions for publication quality figures.
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.pyplot import legend
 import numpy as np
 from cycler import cycler
 from itertools import cycle
@@ -146,7 +145,8 @@ def nu_legend(f, x_scale, x_units, y_scale, y_units):
                label='x: {0} {1}'.format(x_scale,x_units))
     ax.axvline(x=x_max,ymin=0,ymax=vline_max,color='black',lw=2,
                label='y: {0} {1}'.format(y_scale,y_units))
-    legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0, frameon=False)
+    plt.legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0,
+               frameon=False)
 
 
 def nu_boxplot(ax, df, cmap=False, color_list=False,
