@@ -3,9 +3,9 @@ Functions for analyzing oscillatory activity.
 """
 
 import numpy as np
-from scipy import signal
-from scipy.signal import periodogram
 from scipy.stats import gaussian_kde
+from scipy.signal import periodogram
+from scipy.signal import spectrogram
 import pandas as pd
 
 
@@ -329,11 +329,10 @@ def nu_spectrogram(df, window, step, channel, fs=10e3, f_trim=(0,100)):
 
     for sweep in sweeps:
         # compute the spectrogram. f=sample frequencies, t=segment times
-        f, t, Sxx = signal.spectrogram(df[channel].xs(sweep),
-                                       fs, nperseg=window, noverlap=noverlap)
+        f, t, Sxx = spectrogram(df[channel].xs(sweep), fs,
+                                nperseg=window, noverlap=noverlap)
         t -= t[0]  # left align the spectrogram time values
         df_list.append(
         pd.DataFrame(Sxx,index=f,columns=t).loc[f_trim[0]:f_trim[1]])
-
     df = pd.concat(df_list, keys=sweeps, names=['sweep'])
     return df
