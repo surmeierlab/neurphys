@@ -2,6 +2,7 @@
 
 import numpy as np
 from . import utilities as util
+from collections import OrderedDict
 
 
 def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
@@ -309,21 +310,19 @@ def iei_arrays(idx_array, shifts=False, percentiles=False):
     ----------
 
     TODO:
-    - would this be better as if-elif statements?
     """
 
-    fixed_true_idxs = []
     try:
         fixed_true_idxs = _fixed_shift(idx_array, shifts)
-        fixed_dict = {'fixed_{0}'.format(val): fixed_true_idxs[i] for i,val in enumerate(shifts)}
+        fixed_name = ['fixed_{0}'.format(val) for val in shifts]
+        fixed_dict = OrderedDict(list(zip(fixed_name, fixed_true_idxs)))
     except:
         pass
 
-    percent_idxs = []
     try:
         percent_idxs = _percent_shift(idx_array, percentiles)
-        # kept having ordered dict issues. This was the easiest solution.
-        percent_dict = {'percen_{0:.2f}'.format(val): percent_idxs[i] for i,val in enumerate(percentiles)}
+        percent_name = ['percen_{0:.2f}'.format(val) for val in percentiles]
+        percent_dict = OrderedDict(list(zip(percent_name, percent_idxs)))
     except:
         pass
 
