@@ -297,7 +297,8 @@ def iei_arrays(idx_array, shifts=False, percentiles=False):
         should be the same value as input indicies (i.e. if successive
         indicies are 1 ms apart, the shift array should be in the same units).
     percentiles: acending array of fractions
-        an array of the fractions of distances to shift the input idx_array
+        an array of the fractions of distances to shift the input idx_array,
+        limited to 2 decimal places.
 
     Return
     ------
@@ -310,6 +311,7 @@ def iei_arrays(idx_array, shifts=False, percentiles=False):
     ----------
 
     TODO:
+    - add parameter to specify decimal places for 'percentiles'?\
     """
 
     try:
