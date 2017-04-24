@@ -12,7 +12,7 @@ MAINTAINER = 'Chad Estep, Dan Galtieri'
 MAINTAINER_EMAIL = 'chadestep@gmail.com'
 LICENSE = 'GPL'
 DOWNLOAD_URL = 'https://github.com/surmeierlab/neurphys.git'
-VERSION = '0.0'
+VERSION = '0.1.0'
 
 if __name__ == "__main__":
     setup(name=DISTNAME,

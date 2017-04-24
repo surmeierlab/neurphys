@@ -51,7 +51,7 @@ def _create_epoch(df, window, step):
 
     for sweep in sweeps:
         # first index out a single sweep to prevent runover
-        sweep_df = df.ix[sweep]
+        sweep_df = df.loc[sweep]
         for epoch in range(num_epochs):  # faster than a while loop
             # have to add 0 to beginning so the first multiplication
             # has a real number result
@@ -76,18 +76,25 @@ def _epoch_data(df, window, step):
 
     Returns
     -------
-    sweep_names: list
-        List of sweep names from the input DataFrame.
-    epoch_names:
-        List of epoch names made by the _create_epoch function.
-
+    sweep_names: list of strings
+        List of sweep names from the input DataFrame. Defaults to
+        ['sweep001'] if a non-multiindexed DataFrame is passed.
+    epoch_names: list of strings
+        List of epoch names made for the _create_epoch function.
     """
 
-    num_rows = df.index.levshape[1]
+    # pulls diff variables if you pass a non-multiindexed dataframe
+    try:
+        num_rows = df.index.levshape[1]
+        sweep_names = df.index.levels[0].values
+    except AttributeError:
+        num_rows = df.index.shape[0]
+        sweep_names = np.array(['sweep001'], dtype='object')
+
     num_epochs = int(1 + (num_rows - window) / step)
-    sweep_names = df.index.levels[0].values
     epoch_names = ['epoch{}'.format(str(i+1).zfill(3))
                    for i in range(num_epochs)]
+
     return sweep_names, epoch_names
 
 
@@ -319,6 +326,9 @@ def nu_spectrogram(df, window, step, channel, fs=10e3, f_trim=(0,100)):
     df :
         Spectrogram of DataFrame column labeled with frequencies added as row
         indicies and columns as segment times (left aligned).
+
+    TODO:
+    `sweeps = df.index.levels[0].values` attribute error if only pass it a single sweep (no level[0])
     """
 
     # make sure necessary inputs are integers
