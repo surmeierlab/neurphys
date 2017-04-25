@@ -328,21 +328,27 @@ def nu_spectrogram(df, window, step, channel, fs=10e3, f_trim=(0,100)):
         indicies and columns as segment times (left aligned).
 
     TODO:
-    `sweeps = df.index.levels[0].values` attribute error if only pass it a single sweep (no level[0])
+    sweeps = df.index.levels[0].values` attribute error if only pass it a single sweep (no level[0])
     """
 
     # make sure necessary inputs are integers
     window, step, fs = int(window), int(step), int(fs)
     noverlap = window - step
-    df_list = []  # change to a dict once Py3.6 becomes common?
-    sweeps = df.index.levels[0].values
+    sweeps, _ = _epoch_data(df, window, step)
 
-    for sweep in sweeps:
-        # compute the spectrogram. f=sample frequencies, t=segment times
-        f, t, Sxx = spectrogram(df[channel].xs(sweep), fs,
+    # compute the spectrogram. f=sample frequencies, t=segment times
+    if len(sweeps) == 1:
+        f, t, Sxx = spectrogram(df[channel], fs,
                                 nperseg=window, noverlap=noverlap)
         t -= t[0]  # left align the spectrogram time values
-        df_list.append(
-        pd.DataFrame(Sxx,index=f,columns=t).loc[f_trim[0]:f_trim[1]])
-    df = pd.concat(df_list, keys=sweeps, names=['sweep'])
+        df = pd.DataFrame(Sxx,index=f,columns=t).loc[f_trim[0]:f_trim[1]]
+    else:
+        df_list = []
+        for sweep in sweeps:
+            f, t, Sxx = spectrogram(df[channel].xs(sweep), fs,
+                                    nperseg=window, noverlap=noverlap)
+            t -= t[0]  # left align the spectrogram time values
+            df_list.append(
+            pd.DataFrame(Sxx,index=f,columns=t).loc[f_trim[0]:f_trim[1]])
+        df = pd.concat(df_list, keys=sweeps, names=['sweep'])
     return df

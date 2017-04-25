@@ -343,7 +343,7 @@ def nu_scatter(ax, df, alpha=0.35, cmap=False, color_list=False, jitter=0.05,
     # need to draw paired lines first for stacking purposes
     if paired:
         for i in range(len(df)):
-            ax.plot(np.arange(1,column_num+1),df.ix[i],
+            ax.plot(np.arange(1,column_num+1),df.iloc[i],
                     color='000000',alpha=0.5)
     # create the scatter plot
     for i, color_dict in zip(range(column_num), cycle(color_cycler)):
