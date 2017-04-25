@@ -59,7 +59,7 @@ def _create_epoch(df, window, step):
             yield data
 
 
-def _epoch_data(df, window, step):
+def _epoch_attr(df, window, step):
     """
     Returns a few useful parameters about epoch dataframes to use for
     downstream functions.
@@ -137,7 +137,7 @@ def epoch_hist(df, window, step, channel, hist_min, hist_max, num_bins):
     hist_arrays = []
     bin_arrays = []
     epochs = _create_epoch(df, window, step)
-    sweep_names, epoch_names = _epoch_data(df, window, step)
+    sweep_names, epoch_names = _epoch_attr(df, window, step)
 
     # set up indicies for returned df (just easier to remake them here)
     idx = np.arange(num_bins)
@@ -213,7 +213,7 @@ def epoch_kde(df, window, step, channel, range_min, range_max,
         resolution = resolution
 
     epochs = _create_epoch(df, window, step)
-    sweep_names, epoch_names = _epoch_data(df, window, step)
+    sweep_names, epoch_names = _epoch_attr(df, window, step)
 
     # set up indicies for returned df (just easier to remake them here)
     x = np.linspace(range_min, range_max, resolution)
@@ -237,6 +237,7 @@ def epoch_kde(df, window, step, channel, range_min, range_max,
 
     # add the correct multiindex labeling
     df.set_index(index, inplace=True)
+
     return df
 
 
@@ -278,7 +279,7 @@ def epoch_pgram(df, window, step, channel, fs=10e3):
     fs = int(fs)
 
     epochs = _create_epoch(df, window, step)
-    sweep_names, epoch_names = _epoch_data(df, window, step)
+    sweep_names, epoch_names = _epoch_attr(df, window, step)
 
     # set up indicies for returned dataframe (just easier to remake them here)
     idx = np.arange((window/2)+1)
@@ -300,6 +301,7 @@ def epoch_pgram(df, window, step, channel, fs=10e3):
 
     # add the correct multiindex labeling
     df.set_index(index, inplace=True)
+
     return df
 
 
@@ -326,15 +328,12 @@ def nu_spectrogram(df, window, step, channel, fs=10e3, f_trim=(0,100)):
     df :
         Spectrogram of DataFrame column labeled with frequencies added as row
         indicies and columns as segment times (left aligned).
-
-    TODO:
-    sweeps = df.index.levels[0].values` attribute error if only pass it a single sweep (no level[0])
     """
 
     # make sure necessary inputs are integers
     window, step, fs = int(window), int(step), int(fs)
     noverlap = window - step
-    sweeps, _ = _epoch_data(df, window, step)
+    sweeps, _ = _epoch_attr(df, window, step)
 
     # compute the spectrogram. f=sample frequencies, t=segment times
     if len(sweeps) == 1:
@@ -351,4 +350,5 @@ def nu_spectrogram(df, window, step, channel, fs=10e3, f_trim=(0,100)):
             df_list.append(
             pd.DataFrame(Sxx,index=f,columns=t).loc[f_trim[0]:f_trim[1]])
         df = pd.concat(df_list, keys=sweeps, names=['sweep'])
+
     return df

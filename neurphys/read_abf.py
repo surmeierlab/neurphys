@@ -48,6 +48,7 @@ def read_abf(filepath):
         df_list.append(df)
         sweep_list.append('sweep' + str(seg_num + 1).zfill(3))
     df = pd.concat(df_list, keys=sweep_list, names=['sweep'])
+
     return df
 
 
@@ -82,6 +83,7 @@ def keep_sweeps(df, sweep_list):
 
     keep_sweeps = [('sweep'+str(i).zfill(3)) for i in sweep_list]
     keep_df = df.loc[pd.IndexSlice[keep_sweeps]]
+
     return keep_df
 
 
@@ -119,4 +121,5 @@ def drop_sweeps(df, sweep_list):
     # keep_sweeps = list(set(all_sweeps).difference(drop_sweeps))
     keep_sweeps = list(set(all_sweeps) ^ set(drop_sweeps))
     drop_df = df.loc[pd.IndexSlice[keep_sweeps]]
+
     return drop_df

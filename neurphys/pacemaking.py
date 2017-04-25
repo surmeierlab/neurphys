@@ -7,8 +7,8 @@ from collections import OrderedDict
 
 def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
                  kpsh=False, valley=False):
-
-    """Detect peaks in data based on their amplitude and other features.
+    """
+    Detect peaks in data based on their amplitude and other features.
 
     Parameters
     ----------
@@ -38,18 +38,18 @@ def detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising',
 
     Notes
     -----
-    The detection of valleys instead of peaks is performed internally by simply
-    negating the data: `ind_valleys = detect_peaks(-x)`
+    The detection of valleys instead of peaks is performed internally by
+    simply negating the data: `ind_valleys = detect_peaks(-x)`
 
     The function can handle NaN's
 
-    See this IPython Notebook [1]_.
+    See this IPython Notebook [1].
 
     References
     ----------
-    .. [1] http://nbviewer.ipython.org/github/demotu/BMC/blob/master/notebooks/DetectPeaks.ipynb
+    [1] http://nbviewer.ipython.org/github/demotu/BMC/blob/master/notebooks/DetectPeaks.ipynb
 
-    ----------------------------------------------------------------------------
+    -------------------------------------------------------------------------
     Please note, this function is the work of Marcos Duarte.
 
     Citation:
@@ -265,9 +265,6 @@ def _percent_shift(idx_array, percentiles):
     References
     ----------
 
-    TODO:
-    - check 'percentiles' so that they're what they should be (don't on second thought, users should be able to use them how they wish)
-    - turn percent_idxs into 2D numpy array? - currently thinking no for the sake of simplicity
     """
 
     shift = np.roll(idx_array,1)
@@ -311,7 +308,7 @@ def iei_arrays(idx_array, shifts=False, percentiles=False):
     ----------
 
     TODO:
-    - add parameter to specify decimal places for 'percentiles'?\
+    - add parameter to specify decimal places for 'percentiles'?
     """
 
     try:
