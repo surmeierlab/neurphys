@@ -5,6 +5,20 @@ Functions to import and manipulate Axon Binary Files.
 from neo import io
 import pandas as pd
 
+def _all_ints(ii):
+    """
+    list or tuple
+
+    """
+
+    return all(isinstance(i, int) for i in ii)
+
+
+def _all_strs(ii):
+    """ list or tuple """
+
+    return all(isinstance(i, str) for i in ii)
+
 
 def read_abf(filepath):
     """
@@ -60,9 +74,9 @@ def keep_sweeps(df, sweep_list):
     ----------
     df: Pandas DataFrame
         Dataframe created using one of the functions from Neurphys.
-    sweep_list: 1D array_like of ints
+    sweep_list: 1D array_like of ints or properly formatted strings
         List containing numbers of the sweeps you'd like dropped from the
-        DataFrame.
+        DataFrame. Example: [1,4,6] or ['sweep001', 'sweep004', 'sweep006']
 
     Return
     ------
@@ -71,18 +85,18 @@ def keep_sweeps(df, sweep_list):
 
     Notes
     -----
-    Making the grand assumption that the df.index.level[0]=='sweeps'.
-
-    TODO
-    ----
-    As always, I need to build exceptions into this function and just need to
-    make it generally more robust.
-    - make possibility for 'sweep_list' to be either pure numerical list, or
-    actually contain list of sweep names (ex. ['sweep002','sweep016'])
+    Some type checks are made, but not enough to cover the plethora of
+    potential inputs, so read the docs if you're having trouble.
     """
 
-    keep_sweeps = [('sweep'+str(i).zfill(3)) for i in sweep_list]
-    keep_df = df.loc[pd.IndexSlice[keep_sweeps]]
+    if _all_ints(sweep_list):
+        keep_sweeps = [('sweep'+str(i).zfill(3)) for i in sweep_list]
+    elif _all_strs(sweep_list):
+        keep_sweeps = sweep_list
+    else:
+        raise TypeError(
+        'List should either be appropriate sweep names or integers')
+    keep_df = df.loc[keep_sweeps]
 
     return keep_df
 
