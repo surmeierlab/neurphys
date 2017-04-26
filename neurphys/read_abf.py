@@ -40,9 +40,7 @@ def read_abf(filepath):
     r = io.AxonIO(filename=filepath)
     bl = r.read_block(lazy=False, cascade=True)
     num_channels = len(bl.segments[0].analogsignals)
-    channels = ['primary']
     df_list = []
-    signals = []
     sweep_list = []
 
     for seg_num, seg in enumerate(bl.segments):
