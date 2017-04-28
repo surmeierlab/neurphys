@@ -1,6 +1,7 @@
 """ Useful functions for performing ephys data analysis """
 
 import numpy as np
+import pandas as pd
 from scipy.optimize import curve_fit
 
 
@@ -181,7 +182,7 @@ def _mock_df(rows = 20, num_channels = 2):
     return pd.DataFrame(d)
 
 
-def mock_multidf(rows = 20, num_channels = 2, sweeps = 10):
+def mock_multidf(rows = 20, num_channels = 2, num_sweeps = 10):
     """
     Make a mock DataFrame that mimics neurphys.read_abf
     dataframe for testing purposes. Assuming at 10kHz sampling rate.
@@ -198,7 +199,7 @@ def mock_multidf(rows = 20, num_channels = 2, sweeps = 10):
     """
 
     df_dict = {}
-    sweep_names = ['sweep{}'.format(str(sweep+1).zfill(3)) for sweep in range(sweeps)]
+    sweep_names = ['sweep{}'.format(str(sweep+1).zfill(3)) for sweep in range(num_sweeps)]
 
     for sweep in sweep_names:
         df_dict[sweep] = _mock_df(rows=rows, num_channels=num_channels)
