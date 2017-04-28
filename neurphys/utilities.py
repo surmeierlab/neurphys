@@ -152,3 +152,55 @@ def simple_smoothing(data, n):
         smoothed = cum_sum[n - 1:] / n
 
         return np.append(nan_array, smoothed)
+
+
+def _mock_df(rows = 20, num_channels = 2):
+    """
+    Make a mock DataFrame that mimics neurphys.read_abf
+    dataframe for testing purposes. Assuming at 10kHz sampling rate.
+
+    Parameters
+    ----------
+    rows: int (default: 20)
+    num_channels: int (default: 2)
+
+    Return
+    ------
+    d: pd.DataFrame
+        Pandas Dataframe
+
+    Note
+    ----
+    Could do assertion checks, but nope. Not gonna do it.
+    """
+
+    d = {'channel_{}'.format(channel): np.random.randn(rows) for channel in range(num_channels)}
+    d['primary'] = np.random.randn(rows)
+    d['time'] = np.arange(0,(rows*0.0001),0.0001)
+
+    return pd.DataFrame(d)
+
+
+def mock_multidf(rows = 20, num_channels = 2, sweeps = 10):
+    """
+    Make a mock DataFrame that mimics neurphys.read_abf
+    dataframe for testing purposes. Assuming at 10kHz sampling rate.
+
+    Parameters
+    ----------
+    rows: int (default: 20)
+    num_channels: int (default: 2)
+    sweeps: int (default: 10)
+
+    Note
+    ----
+    Could do assertion checks, but nope. Not gonna do it.
+    """
+
+    df_dict = {}
+    sweep_names = ['sweep{}'.format(str(sweep+1).zfill(3)) for sweep in range(sweeps)]
+
+    for sweep in sweep_names:
+        df_dict[sweep] = _mock_df(rows=rows, num_channels=num_channels)
+
+    return pd.concat(df_dict, names=['sweep'])
