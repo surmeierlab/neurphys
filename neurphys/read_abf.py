@@ -80,6 +80,16 @@ def keep_sweeps(df, sweep_list):
     -----
     Some type checks are made, but not enough to cover the plethora of
     potential inputs, so read the docs if you're having trouble.
+
+    Also, this function and `drop_sweeps` are not being unit tested
+    due to a feature/bug with pandas I'm just going to link to [1,2].
+    I'm working on a workaround, but I'm not yet happy with the
+    implementation.
+
+    Links
+    -----
+    [1] https://github.com/pandas-dev/pandas/issues/11056
+    [2] https://github.com/pandas-dev/pandas/issues/2770
     """
 
     if _all_ints(sweep_list):
