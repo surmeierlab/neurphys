@@ -155,7 +155,7 @@ def simple_smoothing(data, n):
         return np.append(nan_array, smoothed)
 
 
-def _mock_df(rows = 20, num_channels = 2):
+def _mock_df(rows=20, num_channels=2):
     """
     Make a mock DataFrame that mimics neurphys.read_abf
     dataframe for testing purposes. Assuming at 10kHz sampling rate.
@@ -182,7 +182,7 @@ def _mock_df(rows = 20, num_channels = 2):
     return pd.DataFrame(d)
 
 
-def mock_multidf(rows = 20, num_channels = 2, num_sweeps = 10):
+def mock_multidf(rows=20, num_channels=2, num_sweeps=10):
     """
     Make a mock DataFrame that mimics neurphys.read_abf
     dataframe for testing purposes. Assuming at 10kHz sampling rate.
