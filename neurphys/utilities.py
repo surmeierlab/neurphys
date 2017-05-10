@@ -102,10 +102,10 @@ def calc_decay(df, peak, peak_time, return_plot_vals=False):
     def exp_decay(x, a, b, c, d, e):
         return a*np.exp(-x/b) + c*np.exp(-x/d) + e
 
-    popt, pcov = curve_fit(exp_decay, x_zeroed*1e3, fit_sub.primary, guess)
+    popt, pcov = curve_fit(exp_decay, x_zeroed*1e3, fit_sub.primary*1e12, guess)
 
     x_full_zeroed = peak_sub.time - peak_sub.time.values[0]
-    y_curve = exp_decay(x_full_zeroed*1e3, *popt)
+    y_curve = exp_decay(x_full_zeroed*1e3, *popt) / 1e12
 
     amp1 = popt[0]
     tau1 = popt[1]
