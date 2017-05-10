@@ -90,23 +90,21 @@ def calc_decay(df, peak, peak_time, return_plot_vals=False):
         index1 = peak_sub[peak_sub.primary >= peak * 0.90].index[0]
         index2 = peak_sub[peak_sub.primary >= peak * 0.05].index[0]
         fit_sub = peak_sub.ix[index1:index2]
-        guess = np.array([-1, 1e-4, -1, 1e-4])
-
     else:
         index1 = peak_sub[peak_sub.primary <= peak * 0.90].index[0]
         index2 = peak_sub[peak_sub.primary <= peak * 0.05].index[0]
         fit_sub = peak_sub.ix[index1:index2]
-        guess = np.array([1, 1e-4, 1, 1e-4])
-
+    
     x_zeroed = fit_sub.time - fit_sub.time.values[0]
-
+    
+    guess = np.array([1, 1, 1, 1])
     def exp_decay(x, a, b, c, d):
         return a*np.exp(-x/b) + c*np.exp(-x/d)
 
-    popt, pcov = curve_fit(exp_decay, x_zeroed, fit_sub.primary, guess)
+    popt, pcov = curve_fit(exp_decay, x_zeroed*1e3, fit_sub.primary, guess)
 
     x_full_zeroed = peak_sub.time - peak_sub.time.values[0]
-    y_curve = exp_decay(x_full_zeroed, *popt)
+    y_curve = exp_decay(x_full_zeroed*1e3, *popt)
 
     amp1 = popt[0]
     tau1 = popt[1]
