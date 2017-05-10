@@ -111,7 +111,7 @@ def calc_decay(df, peak, peak_time, return_plot_vals=False):
     amp2 = popt[2]
     tau2 = popt[3]
 
-    tau = ((tau1*amp1)+(tau2*amp2))/(amp1+amp2)
+    tau = ((tau1*amp1)+(tau2*amp2))/(amp1+amp2) * 1e-3
 
     if return_plot_vals:
         return tau, x_full_zeroed, peak_sub.primary, y_curve
