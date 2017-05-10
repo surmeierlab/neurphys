@@ -73,10 +73,11 @@ def calc_mem_prop(df, bsl_start, bsl_end, pulse_start, pulse_dur, pulse_amp):
 
     peak = peak_df['Peak Amp'].values[0]
     peak_time = peak_df['Peak time'].values[0]
-    tau, x_vals, y_vals, fit_vals = util.calc_decay(data, peak, peak_time, True)
+    tau, x_vals, y_vals, fit_vals, ix1, ix2 = util.calc_decay(data, peak, peak_time, True)
 
     # take integral of curve to get q1
-    q1 = trapz(fit_vals, x_vals)
+    fit_sub = data.loc[ix1:ix2, :]
+    q1 = trapz(fit_sub.primary, fit_sub.time)
 
     # q2 is correction for charge from i_baseline to i_ss
     q2 = tau * delta_i
