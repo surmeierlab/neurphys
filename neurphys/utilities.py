@@ -90,14 +90,15 @@ def calc_decay(df, peak, peak_time, return_plot_vals=False):
         index1 = peak_sub[peak_sub.primary >= peak * 0.90].index[0]
         index2 = peak_sub[peak_sub.primary >= peak * 0.05].index[0]
         fit_sub = peak_sub.ix[index1:index2]
+        guess = np.array([-1, 1, -1, 1])
     else:
         index1 = peak_sub[peak_sub.primary <= peak * 0.90].index[0]
         index2 = peak_sub[peak_sub.primary <= peak * 0.05].index[0]
         fit_sub = peak_sub.ix[index1:index2]
+        guess = np.array([1, 1, 1, 1])
     
     x_zeroed = fit_sub.time - fit_sub.time.values[0]
     
-    guess = np.array([1, 1, 1, 1])
     def exp_decay(x, a, b, c, d):
         return a*np.exp(-x/b) + c*np.exp(-x/d)
 
