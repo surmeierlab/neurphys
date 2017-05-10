@@ -70,7 +70,7 @@ def calc_decay(df, peak, peak_time, return_plot_vals=False):
     peak_time: positive scalar (seconds)
         time at which the peak occurs
     return_plot_vals: boolean, default = False
-        return x, y, and fit_y values for fit associated with tau calculation
+        return x, y, fit_y values, and bounding indexes fit associated with tau calculation
 
     Notes
     -----
@@ -115,7 +115,7 @@ def calc_decay(df, peak, peak_time, return_plot_vals=False):
     tau = ((tau1*amp1)+(tau2*amp2))/(amp1+amp2) * 1e-3
 
     if return_plot_vals:
-        return tau, x_full_zeroed, peak_sub.primary, y_curve
+        return tau, x_full_zeroed, peak_sub.primary, y_curve, index1, index2
     else:
         return tau
 
