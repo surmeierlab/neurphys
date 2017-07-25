@@ -1,3 +1,4 @@
+import neo
 import neurphys.read_abf as read_abf
 import neurphys.utilities as util
 
@@ -20,6 +21,11 @@ def test_all_ints():
     assert read_abf._all_ints(('test', 12345)) == False
     assert read_abf._all_ints((54321, 12345))
     assert read_abf._all_ints(('4321', 12.34)) == False
+
+
+def test_dimensions():
+    pass
+    # assert that neo 'bl.segments[seg_num].analogsignals[i].squeeze()' is 1D
 
 # Testing of keep/drop functions is on hold until bugs have been worked out
 
