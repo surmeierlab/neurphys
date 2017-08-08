@@ -4,6 +4,7 @@ Functions to import and manipulate Axon Binary Files.
 
 from neo import io
 import pandas as pd
+import numpy as np
 
 def _all_ints(ii):
     """ Determines if list or tuples contains only integers """
@@ -47,7 +48,8 @@ def read_abf(filepath):
         channels = ['primary']+['channel_{0}'.format(str(i+1)) for i in range(num_channels-1)]
         signals = []
         for i in range(num_channels):
-            signals.append(bl.segments[seg_num].analogsignals[i])
+            data = np.array(bl.segments[seg_num].analogsignals[i].data)
+            signals.append(data.T[0])
         data_dict = dict(zip(channels, signals))
         time = seg.analogsignals[0].times - seg.analogsignals[0].times[0]
         data_dict['time'] = time
