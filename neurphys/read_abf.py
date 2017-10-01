@@ -45,7 +45,8 @@ def read_abf(filepath):
     sweep_list = []
 
     for seg_num, seg in enumerate(bl.segments):
-        channels = ['primary']+['channel_{0}'.format(str(i+1)) for i in range(num_channels-1)]
+        channels = ['primary']+['channel_{0}'.format(str(i+1))
+                                for i in range(num_channels-1)]
         signals = []
         for i in range(num_channels):
             data = np.array(bl.segments[seg_num].analogsignals[i].data)
@@ -56,7 +57,7 @@ def read_abf(filepath):
         df = pd.DataFrame(data_dict)
         df_list.append(df)
         sweep_list.append('sweep' + str(seg_num + 1).zfill(3))
-    df = pd.concat(df_list, keys=sweep_list, names=['sweep'])
+    df = pd.concat(df_list, keys=sweep_list, names=['sweep', 'index'])
 
     return df
 

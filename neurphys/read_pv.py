@@ -43,14 +43,14 @@ def parse_xml(filename):
             clamp_device = parent.find('.//PatchclampDevice').text
             name = parent.find('.//Name').text.lower()
             ch_names.append(name)
-            
+
             if clamp_device is not None:
                 unit, divisor = _get_ephys_vals(parent)
                 divisors[name] = divisor
                 units[name] = unit
             else:
                 units[name] = 'V'
-            
+
     file_attr['channels'] = ch_names
     file_attr['divisors'] = divisors
     file_attr['units'] = units
@@ -144,7 +144,7 @@ def import_folder(folder):
         output = {}
 
         for i, file in enumerate(vr_xmls):
-            sweep = 'Sweep' + str(i+1).zfill(4)
+            sweep = 'sweep' + str(i+1).zfill(3)
             sweep_list.append(sweep)
             file_vals = parse_xml(file)
 
@@ -152,7 +152,7 @@ def import_folder(folder):
                 vr_filename = os.path.join(folder,
                                            (file_vals['voltage recording file']
                                             + '.csv'))
-                
+
                 df_vr = import_vr_csv(vr_filename,
                                       file_vals['channels'],
                                       file_vals['divisors'])
@@ -171,12 +171,12 @@ def import_folder(folder):
 
         if data_vr:
             output["voltage recording"] = pd.concat(data_vr, keys=sweep_list,
-                                                    names=['Sweep', 'Index'])
+                                                    names=['sweep', 'index'])
         elif not data_vr:
             output["voltage recording"] = None
         if data_ls:
             output["linescan"] = pd.concat(data_ls, keys=sweep_list,
-                                           names=['Sweep', 'Index'])
+                                           names=['sweep', 'index'])
         elif not data_ls:
             output["linescan"] = None
         output["file attributes"] = file_attr
