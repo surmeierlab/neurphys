@@ -110,7 +110,7 @@ def import_ls_csv(filename):
     df = pd.read_csv(filename, skipinitialspace=True)
     df.rename(columns=lambda header: header.strip('(ms)'), inplace=True)
     # time columns occur as every other column, starting with column 0
-    df.ix[:, ::2] /= 1000
+    df.loc[:, ::2] /= 1000
 
     return df
 

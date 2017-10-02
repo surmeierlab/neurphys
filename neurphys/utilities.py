@@ -70,7 +70,8 @@ def calc_decay(df, peak, peak_time, return_plot_vals=False):
     peak_time: positive scalar (seconds)
         time at which the peak occurs
     return_plot_vals: boolean, default = False
-        return x, y, fit_y values, and bounding indexes fit associated with tau calculation
+        return x, y, fit_y values, and bounding indexes fit associated with
+        tau calculation
 
     Notes
     -----
@@ -89,20 +90,21 @@ def calc_decay(df, peak, peak_time, return_plot_vals=False):
     if peak < 0:
         index1 = peak_sub[peak_sub.primary >= peak * 0.90].index[0]
         index2 = peak_sub[peak_sub.primary >= peak * 0.05].index[0]
-        fit_sub = peak_sub.ix[index1:index2]
+        fit_sub = peak_sub.loc[index1:index2]
         guess = np.array([-1, 1, -1, 1, 0])
     else:
         index1 = peak_sub[peak_sub.primary <= peak * 0.90].index[0]
         index2 = peak_sub[peak_sub.primary <= peak * 0.05].index[0]
-        fit_sub = peak_sub.ix[index1:index2]
+        fit_sub = peak_sub.loc[index1:index2]
         guess = np.array([1, 1, 1, 1, 0])
-    
+
     x_zeroed = fit_sub.time - fit_sub.time.values[0]
-    
+
     def exp_decay(x, a, b, c, d, e):
         return a*np.exp(-x/b) + c*np.exp(-x/d) + e
 
-    popt, pcov = curve_fit(exp_decay, x_zeroed*1e3, fit_sub.primary*1e12, guess)
+    popt, pcov = curve_fit(exp_decay, x_zeroed*1e3,
+                           fit_sub.primary*1e12, guess)
 
     x_full_zeroed = peak_sub.time - peak_sub.time.values[0]
     y_curve = exp_decay(x_full_zeroed*1e3, *popt) / 1e12
@@ -154,7 +156,7 @@ def simple_smoothing(data, n):
         return np.append(nan_array, smoothed)
 
 
-def _mock_df(rows = 20, num_channels = 2):
+def _mock_df(rows=20, num_channels=2):
     """
     Make a mock DataFrame that mimics neurphys.read_abf
     dataframe for testing purposes. Assuming at 10kHz sampling rate.
@@ -167,21 +169,22 @@ def _mock_df(rows = 20, num_channels = 2):
     Return
     ------
     d: pd.DataFrame
-        Pandas Dataframe
+        Pandas DataFrame
 
     Note
     ----
     Could do assertion checks, but nope. Not gonna do it.
     """
 
-    d = {'channel_{}'.format(channel): np.random.randn(rows) for channel in range(num_channels)}
+    d = {'channel_{}'.format(channel): np.random.randn(rows)
+         for channel in range(num_channels)}
     d['primary'] = np.random.randn(rows)
-    d['time'] = np.arange(0,(rows*0.0001),0.0001)
+    d['time'] = np.arange(0, (rows*0.0001), 0.0001)
 
     return pd.DataFrame(d)
 
 
-def mock_multidf(rows = 20, num_channels = 2, num_sweeps = 10):
+def mock_multidf(rows=20, num_channels=2, num_sweeps=10):
     """
     Make a mock DataFrame that mimics neurphys.read_abf
     dataframe for testing purposes. Assuming at 10kHz sampling rate.
@@ -198,7 +201,8 @@ def mock_multidf(rows = 20, num_channels = 2, num_sweeps = 10):
     """
 
     df_dict = {}
-    sweep_names = ['sweep{}'.format(str(sweep+1).zfill(3)) for sweep in range(num_sweeps)]
+    sweep_names = ['sweep{}'.format(str(sweep+1).zfill(3))
+                   for sweep in range(num_sweeps)]
 
     for sweep in sweep_names:
         df_dict[sweep] = _mock_df(rows=rows, num_channels=num_channels)

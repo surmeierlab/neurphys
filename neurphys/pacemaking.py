@@ -176,7 +176,7 @@ def calc_freq(df, mph, mpd, valley=False, hz=True,
                                valley=valley, mpd=mpd)
     else:
         indices = detect_peaks(df['primary'].values, mph=mph, mpd=mpd)
-    times = df['time'].ix[indices].values
+    times = df.loc[indices, 'time'].values
     times_dif = times[1:] - times[:-1]
 
     if hz:
