@@ -138,6 +138,7 @@ def simple_smoothing(data, n):
     Return:
     1D array of same length as input array (data)
     """
+    data = np.atleast_1d(data).astype('float64')
     if np.isnan(np.sum(data)):
         starting_nans = data[np.isnan(data)]
         data_no_nan = data[len(starting_nans):]
