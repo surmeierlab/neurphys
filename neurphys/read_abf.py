@@ -43,6 +43,7 @@ def read_abf(filepath):
     num_channels = len(bl.segments[0].analogsignals)
     df_list = []
     sweep_list = []
+    units = []
 
     for seg_num, seg in enumerate(bl.segments):
         channels = ['primary']+['channel_{0}'.format(str(i+1))
@@ -51,6 +52,8 @@ def read_abf(filepath):
         for i in range(num_channels):
             data = np.array(bl.segments[seg_num].analogsignals[i].data)
             signals.append(data.T[0])
+            unit = bl.segments[seg_num].analogsignals[i].units
+            units.append(str(unit).split()[-1])
         data_dict = dict(zip(channels, signals))
         time = seg.analogsignals[0].times - seg.analogsignals[0].times[0]
         data_dict['time'] = time
@@ -58,6 +61,7 @@ def read_abf(filepath):
         df_list.append(df)
         sweep_list.append('sweep' + str(seg_num + 1).zfill(3))
     df = pd.concat(df_list, keys=sweep_list, names=['sweep', 'index'])
+    df.channel_units = units
 
     return df
 
