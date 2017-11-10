@@ -2,6 +2,7 @@
 Functions to import and manipulate Axon Binary Files.
 """
 
+from collections import OrderedDict
 from neo import io
 import pandas as pd
 import numpy as np
@@ -43,7 +44,7 @@ def read_abf(filepath):
     num_channels = len(bl.segments[0].analogsignals)
     df_list = []
     sweep_list = []
-    units = []
+    units = ['s']
 
     for seg_num, seg in enumerate(bl.segments):
         channels = ['primary']+['channel_{0}'.format(str(i+1))
@@ -54,9 +55,10 @@ def read_abf(filepath):
             signals.append(data.T[0])
             unit = bl.segments[seg_num].analogsignals[i].units
             units.append(str(unit).split()[-1])
-        data_dict = dict(zip(channels, signals))
+        data_dict = OrderedDict(zip(channels, signals))
         time = seg.analogsignals[0].times - seg.analogsignals[0].times[0]
-        data_dict['time'] = time
+        data_dict.update({'time': time})
+        data_dict.move_to_end('time', last=False)
         df = pd.DataFrame(data_dict)
         df_list.append(df)
         sweep_list.append('sweep' + str(seg_num + 1).zfill(3))
